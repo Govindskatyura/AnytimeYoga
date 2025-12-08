@@ -25,7 +25,31 @@ const TeacherManagement = () => {
             { id: 'TCH002', name: 'David Lee', email: 'david@anytimeyoga.com', specialization: ['Power Yoga', 'Yin'], status: 'approved', totalSessions: 32, rating: 4.6 },
             { id: 'TCH003', name: 'Sophie Martinez', email: 'sophie@anytimeyoga.com', specialization: ['Kundalini', 'Meditation'], status: 'pending', totalSessions: 0, rating: 0 },
             { id: 'TCH004', name: 'James Chen', email: 'james@anytimeyoga.com', specialization: ['Vinyasa', 'Power Yoga'], status: 'pending', totalSessions: 0, rating: 0 },
-            { id: 'TCH005', name: 'Lisa Anderson', email: 'lisa@anytimeyoga.com', specialization: ['Hatha', 'Yin'], status: 'disabled', totalSessions: 28, rating: 4.5 }
+            { id: 'TCH005', name: 'Lisa Anderson', email: 'lisa@anytimeyoga.com', specialization: ['Hatha', 'Yin'], status: 'disabled', totalSessions: 28, rating: 4.5 },
+            {
+                id: 'TCH006',
+                name: 'Abhay Pandey',
+                email: 'abhaypandey567@gmail.com',
+                phone: '+91 745 485 0412',
+                title: 'Life Coach (Guide and Therapeutic Counselor for Young Adults)',
+                specialization: ['Life Coaching', 'Counseling', 'Hatha', 'Vinyasa', 'Restorative', 'Meditation'],
+                status: 'approved',
+                totalSessions: 0,
+                rating: 0,
+                about: 'As a young adult counselor, I have created a secure and confidential program focused on spiritual growth, self-confidence, and emotional renewal through tailored yoga exercises, relaxation methods, healing affirmations, and self-guided practices. I have many years of experience providing health and wellness support counselling that provides an all-around holistic mind, body, and soul healing.',
+                education: [
+                    'Master of Science in Psychology / Counseling',
+                    'Registered Yoga Teacher - Yoga Alliance – The Yog Institute Mumbai'
+                ],
+                expertise: [
+                    'Addiction Counseling & Recovery Support',
+                    'Cognitive Behavioral Therapy (CBT)',
+                    'Trauma-Informed Care',
+                    'Crisis Intervention',
+                    'Yoga for Anxiety & Depression',
+                    'Mindfulness & Meditation'
+                ]
+            }
         ])
     }, [navigate])
 
@@ -167,8 +191,8 @@ const TeacherManagement = () => {
                         <button
                             onClick={() => setActiveTab('pending')}
                             className={`px-6 py-3 rounded-lg font-medium transition-colors ${activeTab === 'pending'
-                                    ? 'bg-orange-600 text-white'
-                                    : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                                ? 'bg-orange-600 text-white'
+                                : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
                                 }`}
                         >
                             Pending ({pendingTeachers.length})
@@ -176,8 +200,8 @@ const TeacherManagement = () => {
                         <button
                             onClick={() => setActiveTab('approved')}
                             className={`px-6 py-3 rounded-lg font-medium transition-colors ${activeTab === 'approved'
-                                    ? 'bg-green-600 text-white'
-                                    : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                                ? 'bg-green-600 text-white'
+                                : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
                                 }`}
                         >
                             Approved ({approvedTeachers.length})
@@ -185,8 +209,8 @@ const TeacherManagement = () => {
                         <button
                             onClick={() => setActiveTab('disabled')}
                             className={`px-6 py-3 rounded-lg font-medium transition-colors ${activeTab === 'disabled'
-                                    ? 'bg-gray-600 text-white'
-                                    : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                                ? 'bg-gray-600 text-white'
+                                : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
                                 }`}
                         >
                             Disabled ({disabledTeachers.length})

@@ -29,8 +29,8 @@ const HeroSection = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
             </div>
 
-            <div className="container-custom px-6 relative z-10 pt-20">
-                <div className="max-w-2xl">
+            <div className="relative z-10 pt-20 px-6 md:px-12 lg:px-20">
+                <div className="max-w-2xl"> {/* Content on left */}
                     {/* Badge */}
                     <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 shadow-sm mb-8 animate-fade-in">
                         <span className="flex items-center text-yellow-400">
@@ -55,7 +55,7 @@ const HeroSection = () => {
                     </p>
 
                     {/* CTA Buttons */}
-                    <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+                    <div className="flex flex-col sm:flex-row items-start space-y-4 sm:space-y-0 sm:space-x-6 animate-slide-up" style={{ animationDelay: '0.2s' }}>
                         <Link to="/free-trial">
                             <Button size="large" className="w-full sm:w-auto shadow-xl shadow-yoga-sage-900/50 hover:shadow-2xl hover:shadow-yoga-sage-800/50 transition-all duration-500 border border-white/10">
                                 <span className="flex items-center space-x-2">
@@ -66,7 +66,7 @@ const HeroSection = () => {
                         </Link>
 
                         <Link to="/watch-demo" className="w-full sm:w-auto">
-                            <button className="flex items-center space-x-4 group w-full justify-center sm:justify-start">
+                            <button className="flex items-center space-x-4 group w-full sm:w-auto">
                                 <div className="w-14 h-14 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full flex items-center justify-center shadow-lg text-white group-hover:scale-110 transition-transform duration-300 group-hover:bg-white/20">
                                     <Play size={20} fill="currentColor" className="ml-1" />
                                 </div>

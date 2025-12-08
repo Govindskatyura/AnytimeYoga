@@ -49,8 +49,9 @@ const TeacherLogin = () => {
         // Simulate API call
         setTimeout(() => {
             setIsLoading(false)
-            // Mock successful login
+            // Mock successful login - store auth and teacher email
             localStorage.setItem('teacherAuth', 'true')
+            localStorage.setItem('teacherEmail', formData.email)
             navigate('/teacher/dashboard')
         }, 1500)
     }

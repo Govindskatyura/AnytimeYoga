@@ -32,7 +32,23 @@ const Header = () => {
         if (adminAuth) {
             setAuthState({ isLoggedIn: true, role: 'admin', name: 'Admin' })
         } else if (teacherAuth) {
-            setAuthState({ isLoggedIn: true, role: 'teacher', name: 'Teacher' })
+            // Get teacher's actual name from email
+            const teacherEmail = localStorage.getItem('teacherEmail')
+
+            // Teacher database (same as in TeacherDashboard)
+            const allTeachers = [
+                { id: 'TCH001', name: 'Emma Wilson', email: 'emma@anytimeyoga.com' },
+                { id: 'TCH002', name: 'David Lee', email: 'david@anytimeyoga.com' },
+                { id: 'TCH003', name: 'Sophie Martinez', email: 'sophie@anytimeyoga.com' },
+                { id: 'TCH006', name: 'Abhay Pandey', email: 'abhaypandey567@gmail.com' },
+                { id: 'TCH007', name: 'Priya Sharma', email: 'priya.sharma@anytimeyoga.com' },
+                { id: 'TCH008', name: 'Teacher Demo', email: 'teacher@anytimeyoga.com' }
+            ]
+
+            const currentTeacher = allTeachers.find(t => t.email === teacherEmail)
+            const teacherName = currentTeacher ? currentTeacher.name : 'Teacher'
+
+            setAuthState({ isLoggedIn: true, role: 'teacher', name: teacherName })
         } else if (userAuth) {
             setAuthState({ isLoggedIn: true, role: 'user', name: 'User' })
         } else {

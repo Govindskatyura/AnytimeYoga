@@ -4,14 +4,18 @@ import { Clock, User } from 'lucide-react'
 const TimeSlots = ({ selectedDate, selectedTime, onTimeSelect }) => {
     // Mock time slots with availability
     const timeSlots = [
+        { time: '07:00 AM', instructor: 'Abhay Pandey', available: true },
         { time: '07:00 AM', instructor: 'Emma Wilson', available: true },
         { time: '08:00 AM', instructor: 'David Chen', available: true },
+        { time: '08:00 AM', instructor: 'Abhay Pandey', available: true },
         { time: '09:00 AM', instructor: 'Sarah Johnson', available: false },
         { time: '10:00 AM', instructor: 'Maya Devi', available: true },
         { time: '12:00 PM', instructor: 'David Chen', available: true },
         { time: '02:00 PM', instructor: 'Emma Wilson', available: false },
         { time: '04:00 PM', instructor: 'Sarah Johnson', available: true },
+        { time: '06:00 PM', instructor: 'Abhay Pandey', available: true },
         { time: '06:00 PM', instructor: 'Maya Devi', available: true },
+        { time: '07:00 PM', instructor: 'Abhay Pandey', available: true },
         { time: '08:00 PM', instructor: 'David Chen', available: true },
     ]
 

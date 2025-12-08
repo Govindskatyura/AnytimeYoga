@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { LogOut, Bell, CheckCircle, DollarSign, TrendingUp, Calendar, Award, Clock, Users, BarChart3 } from 'lucide-react'
+import { useNavigate, Link } from 'react-router-dom'
+import { LogOut, Bell, CheckCircle, DollarSign, TrendingUp, Calendar, Award, Clock, Users, BarChart3, User } from 'lucide-react'
 import Header from '../../layouts/Header'
 import PendingRequests from '../../components/teacher/PendingRequests'
 import ApprovedSessions from '../../components/teacher/ApprovedSessions'
@@ -13,18 +13,27 @@ const TeacherDashboard = () => {
     const [showSuccess, setShowSuccess] = useState(false)
     const [successMessage, setSuccessMessage] = useState('')
     const [timeRange, setTimeRange] = useState('monthly')
+    const [teacherProfile, setTeacherProfile] = useState(null)
 
-    // Teacher profile data
-    const teacherProfile = {
-        name: 'Priya Sharma',
-        email: 'priya.sharma@anytimeyoga.com',
-        phone: '+91 98765 43210',
-        specialization: 'Vinyasa & Power Yoga',
-        experience: '8 years',
-        rating: 4.9,
-        totalSessions: 245,
-        image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop'
-    }
+    // All teachers data (same as in TeacherManagement)
+    const allTeachers = [
+        { id: 'TCH001', name: 'Emma Wilson', email: 'emma@anytimeyoga.com', specialization: ['Vinyasa', 'Hatha'], phone: '+91 98765 43210', totalSessions: 45, rating: 4.8, image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop' },
+        { id: 'TCH002', name: 'David Lee', email: 'david@anytimeyoga.com', specialization: ['Power Yoga', 'Yin'], phone: '+91 98765 43211', totalSessions: 32, rating: 4.6, image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop' },
+        { id: 'TCH003', name: 'Sophie Martinez', email: 'sophie@anytimeyoga.com', specialization: ['Kundalini', 'Meditation'], phone: '+91 98765 43212', totalSessions: 0, rating: 0, image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=200&auto=format&fit=crop' },
+        {
+            id: 'TCH006',
+            name: 'Abhay Pandey',
+            email: 'abhaypandey567@gmail.com',
+            phone: '+91 745 485 0412',
+            specialization: ['Life Coaching', 'Counseling', 'Hatha', 'Vinyasa', 'Restorative', 'Meditation'],
+            totalSessions: 0,
+            rating: 0,
+            image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop',
+            title: 'Life Coach (Guide and Therapeutic Counselor for Young Adults)'
+        },
+        { id: 'TCH007', name: 'Priya Sharma', email: 'priya.sharma@anytimeyoga.com', specialization: ['Vinyasa', 'Power Yoga'], phone: '+91 98765 43210', totalSessions: 245, rating: 4.9, image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop' },
+        { id: 'TCH008', name: 'Teacher Demo', email: 'teacher@anytimeyoga.com', specialization: ['All Styles'], phone: '+91 98765 43213', totalSessions: 100, rating: 4.7, image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=200&auto=format&fit=crop' }
+    ]
 
     // Earnings data
     const earningsData = {
@@ -48,6 +57,27 @@ const TeacherDashboard = () => {
         if (!isAuthenticated) {
             navigate('/')
             return
+        }
+
+        // Get logged-in teacher's email
+        const teacherEmail = localStorage.getItem('teacherEmail')
+
+        // Find teacher profile by email
+        const currentTeacher = allTeachers.find(t => t.email === teacherEmail)
+
+        if (currentTeacher) {
+            setTeacherProfile(currentTeacher)
+        } else {
+            // Fallback to default teacher if email not found
+            setTeacherProfile({
+                name: 'Teacher',
+                email: teacherEmail || 'teacher@anytimeyoga.com',
+                phone: '+91 00000 00000',
+                specialization: ['Yoga'],
+                totalSessions: 0,
+                rating: 0,
+                image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=200&auto=format&fit=crop'
+            })
         }
 
         setSessions([
@@ -97,6 +127,7 @@ const TeacherDashboard = () => {
 
     const handleLogout = () => {
         localStorage.removeItem('teacherAuth')
+        localStorage.removeItem('teacherEmail')
         navigate('/')
     }
 
@@ -177,7 +208,7 @@ const TeacherDashboard = () => {
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <p className="text-pink-100 text-sm mb-1">Completed Sessions</p>
-                                        <p className="text-3xl font-bold">{teacherProfile.totalSessions}+</p>
+                                        <p className="text-3xl font-bold">{teacherProfile?.totalSessions || 0}+</p>
                                     </div>
                                     <div className="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center">
                                         <Users size={28} />
@@ -486,15 +517,26 @@ const TeacherDashboard = () => {
                                     <div className="mt-6 pt-6 border-t border-gray-200">
                                         <div className="flex items-center space-x-3 mb-4">
                                             <img
-                                                src={teacherProfile.image}
-                                                alt={teacherProfile.name}
+                                                src={teacherProfile?.image}
+                                                alt={teacherProfile?.name}
                                                 className="w-12 h-12 rounded-full object-cover border-2 border-yoga-sage-200"
                                             />
                                             <div>
-                                                <p className="font-semibold text-gray-900">{teacherProfile.name}</p>
-                                                <p className="text-xs text-gray-500">{teacherProfile.specialization}</p>
+                                                <p className="font-semibold text-gray-900">{teacherProfile?.name}</p>
+                                                <p className="text-xs text-gray-500">
+                                                    {Array.isArray(teacherProfile?.specialization)
+                                                        ? teacherProfile.specialization.join(', ')
+                                                        : teacherProfile?.specialization}
+                                                </p>
                                             </div>
                                         </div>
+                                        <Link
+                                            to="/teacher/profile"
+                                            className="w-full flex items-center justify-center space-x-2 px-4 py-2.5 bg-yoga-sage-100 hover:bg-yoga-sage-200 rounded-xl transition-colors text-yoga-sage-700 font-medium mb-2"
+                                        >
+                                            <User size={18} />
+                                            <span>View Profile</span>
+                                        </Link>
                                         <button
                                             onClick={handleLogout}
                                             className="w-full flex items-center justify-center space-x-2 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors text-gray-700 font-medium"
