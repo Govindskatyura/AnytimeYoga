@@ -41,7 +41,7 @@ const benefits = [
         title: "Energy Boost",
         description: "Revitalize your body and fight fatigue with energizing yoga flows.",
         color: "bg-yellow-500",
-        image: "https://images.unsplash.com/photo-1544367563-12123d8965cd?q=80&w=800&auto=format&fit=crop",
+        image: "/energy-boost.jpg",
         tip: "Feeling sluggish? Try 3 rounds of Sun Salutations to wake up every cell."
     },
     {

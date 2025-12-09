@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { ArrowLeft, Mail, Phone, Award, Star, TrendingUp, Calendar, User, Edit2 } from 'lucide-react'
+import { ArrowLeft, Mail, Phone, Award, Star, TrendingUp, Calendar, User, Edit2, BookOpen, Briefcase, GraduationCap, Lightbulb } from 'lucide-react'
 import Header from '../../layouts/Header'
 import Button from '../../components/ui/Button'
 
 const TeacherProfile = () => {
     const navigate = useNavigate()
     const [teacherProfile, setTeacherProfile] = useState(null)
+    const [showFullAbout, setShowFullAbout] = useState(false)
 
     // All teachers data (same as in TeacherDashboard)
     const allTeachers = [
@@ -22,7 +23,52 @@ const TeacherProfile = () => {
             totalSessions: 0,
             rating: 0,
             image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop',
-            title: 'Life Coach (Guide and Therapeutic Counselor for Young Adults)'
+            title: 'Life Coach (Guide and Therapeutic Counselor for Young Adults)',
+            about: {
+                passion: 'In this age of social media information onslaught, the teenage young adults are subject to extreme degrees of change, growth, and discovery. The teenage years are a time of stress, anxiety, and confusion and adolescents face a range of challenges, including academic pressure, social issues, family, and relationship conflicts. I strongly believe that there should be formal training and exposure to tools and methods that teenagers can learn to help ensure they have power to control their emotional well-being and navigate through the phases of confusion and distress due to changing conditions in their lives.',
+                approach: 'As a young adult counselor, I have created a secure and confidential program focused on spiritual growth, self-confidence, and emotional renewal through tailored yoga exercises, relaxation methods, healing affirmations, and self-guided practices. I have many years of experience providing health and wellness support counselling that provides an all-around holistic mind, body, and soul healing. I have witnessed many teenagers successfully overcoming phases of addiction, anxiety, depression, and trauma. My expertise lies in combining evidence-based therapeutic techniques with trauma-informed yoga and mindfulness practices to foster a loving environment that automatically facilitates healing, emotional regulation, and sustainable recovery.'
+            },
+            keySkills: [
+                'Ability to create a loving non-judgmental space',
+                'Leverage past experiences to tailor a customized approach',
+                'Ability to be perceived more as a guide than a teacher',
+                'Deep knowledge of Hatha, Vinyasa, and Restorative Yoga',
+                'Years of experience and knowledge of pranayama techniques and meditation practices',
+                'Skilled in Mindfulness & Somatic Awareness Techniques',
+                'Naturally gifted Empathetic Communicator & Active Listener',
+                'Strict adherence to Confidentiality & Ethical Practices'
+            ],
+            expertise: [
+                'Client Assessment & Course of Action Planning',
+                'Addiction Counseling & Recovery Support',
+                'Group Therapy Sessions',
+                'Cognitive Behavioral Therapy (CBT)',
+                'Group Facilitation & Workshop Coordination',
+                'Motivational Interviewing',
+                'Trauma-Informed Care Planning',
+                'Crisis Intervention & De-escalation',
+                'Yoga for Anxiety & Depression',
+                'Relapse Prevention Planning',
+                'Individual & Group Class Instruction',
+                'Interdisciplinary Collaboration'
+            ],
+            education: [
+                'Master of Science in Psychology / Counseling',
+                'Registered Yoga Teacher - Yoga Alliance – The Yog Institute Mumbai'
+            ],
+            experience: [
+                'Working as a freelance coach and counselor for various rehabilitation centers in India',
+                'Served as a Yoga teacher in Convent school',
+                'Conducted individual and group therapy sessions for a caseload of 25+ clients with substance use disorders and co-occurring mental health diagnoses',
+                'Developed and implemented personalized treatment plans utilizing CBT and Motivational Interviewing to support clients\' recovery journeys',
+                'Facilitated weekly psycho-educational groups on topics including relapse prevention, emotional regulation, and coping skills',
+                'Designed and taught specialized yoga classes for individuals in addiction recovery, focusing on grounding, stress reduction, and reconnecting with the body',
+                'Incorporated trauma-informed principles to ensure a safe and empowering environment for all participants',
+                'Led guided meditation and pranayama (breathwork) sessions to help clients manage cravings and anxiety symptoms',
+                'Tailored one-on-one yoga sessions for clients with specific physical or psychological needs',
+                'Created and launched a unique 8-week program integrating yoga and mindfulness practices with cognitive-behavioral tools for mental wellness',
+                'Managed all aspects of program delivery, including marketing, client intake, and session planning'
+            ]
         },
         { id: 'TCH007', name: 'Priya Sharma', email: 'priya.sharma@anytimeyoga.com', specialization: ['Vinyasa', 'Power Yoga'], phone: '+91 98765 43210', totalSessions: 245, rating: 4.9, image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop' },
         { id: 'TCH008', name: 'Teacher Demo', email: 'teacher@anytimeyoga.com', specialization: ['All Styles'], phone: '+91 98765 43213', totalSessions: 100, rating: 4.7, image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=200&auto=format&fit=crop' }
@@ -230,6 +276,115 @@ const TeacherProfile = () => {
                                     )}
                                 </div>
                             </div>
+
+                            {/* About Section */}
+                            {teacherProfile.about && (
+                                <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200 mt-6">
+                                    <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center space-x-2">
+                                        <BookOpen size={20} className="text-yoga-sage-600" />
+                                        <span>About My Passion</span>
+                                    </h2>
+                                    <div className="text-gray-700">
+                                        <p className="leading-relaxed text-sm">
+                                            {showFullAbout
+                                                ? teacherProfile.about.passion
+                                                : `${teacherProfile.about.passion.substring(0, 200)}...`
+                                            }
+                                        </p>
+                                        {showFullAbout && (
+                                            <p className="leading-relaxed mt-3 text-sm">{teacherProfile.about.approach}</p>
+                                        )}
+                                        <button
+                                            onClick={() => setShowFullAbout(!showFullAbout)}
+                                            className="mt-3 text-yoga-sage-600 hover:text-yoga-sage-700 font-medium text-xs flex items-center space-x-1 transition-colors"
+                                        >
+                                            <span>{showFullAbout ? 'Read Less' : 'Read More'}</span>
+                                            <svg
+                                                className={`w-3 h-3 transition-transform ${showFullAbout ? 'rotate-180' : ''}`}
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Key Skills Section */}
+                            {teacherProfile.keySkills && teacherProfile.keySkills.length > 0 && (
+                                <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200 mt-6">
+                                    <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center space-x-2">
+                                        <Lightbulb size={20} className="text-yoga-sage-600" />
+                                        <span>Key Skills</span>
+                                    </h2>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                        {teacherProfile.keySkills.map((skill, idx) => (
+                                            <div key={idx} className="flex items-start space-x-2 p-2.5 bg-gradient-to-r from-yoga-sage-50 to-yoga-lavender-50 rounded-lg border border-yoga-sage-100">
+                                                <div className="w-1.5 h-1.5 bg-yoga-sage-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                                                <p className="text-xs text-gray-700 leading-relaxed">{skill}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Areas of Expertise Section */}
+                            {teacherProfile.expertise && teacherProfile.expertise.length > 0 && (
+                                <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200 mt-6">
+                                    <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center space-x-2">
+                                        <Award size={20} className="text-yoga-sage-600" />
+                                        <span>Areas of Expertise</span>
+                                    </h2>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                                        {teacherProfile.expertise.map((area, idx) => (
+                                            <div key={idx} className="flex items-center space-x-2 p-2 bg-blue-50 rounded-lg border border-blue-100">
+                                                <div className="w-1 h-1 bg-blue-500 rounded-full flex-shrink-0"></div>
+                                                <p className="text-xs text-gray-700 font-medium">{area}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Education & Certifications Section */}
+                            {teacherProfile.education && teacherProfile.education.length > 0 && (
+                                <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200 mt-6">
+                                    <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center space-x-2">
+                                        <GraduationCap size={20} className="text-yoga-sage-600" />
+                                        <span>Education & Certifications</span>
+                                    </h2>
+                                    <div className="space-y-2">
+                                        {teacherProfile.education.map((edu, idx) => (
+                                            <div key={idx} className="flex items-start space-x-3 p-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-100">
+                                                <div className="w-8 h-8 bg-purple-200 rounded-full flex items-center justify-center flex-shrink-0">
+                                                    <GraduationCap size={16} className="text-purple-700" />
+                                                </div>
+                                                <p className="text-xs text-gray-800 font-medium leading-relaxed pt-0.5">{edu}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Professional Experience Section */}
+                            {teacherProfile.experience && teacherProfile.experience.length > 0 && (
+                                <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200 mt-6">
+                                    <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center space-x-2">
+                                        <Briefcase size={20} className="text-yoga-sage-600" />
+                                        <span>Professional Experience</span>
+                                    </h2>
+                                    <div className="space-y-2">
+                                        {teacherProfile.experience.map((exp, idx) => (
+                                            <div key={idx} className="flex items-start space-x-2 p-2 hover:bg-gray-50 rounded-lg transition-colors">
+                                                <div className="w-1 h-1 bg-green-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                                                <p className="text-xs text-gray-700 leading-relaxed">{exp}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </section>

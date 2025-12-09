@@ -48,7 +48,7 @@ const WhyYogaSection = () => {
 
                     {/* Verified Experts */}
                     <Card
-                        coverImage="https://images.unsplash.com/photo-1599447421405-0c323d27bc5d?q=80&w=800&auto=format&fit=crop"
+                        coverImage="https://images.unsplash.com/photo-1506126613408-eca07ce68773?q=80&w=800&auto=format&fit=crop"
                         className="h-full hover:shadow-xl transition-all duration-300 hover:-translate-y-2"
                     >
                         <div className="flex flex-col items-center text-center">

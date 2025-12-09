@@ -12,7 +12,7 @@ const Header = () => {
     const navigate = useNavigate()
 
     // Pages with dark hero sections where header should be white at top
-    const darkHeroPages = ['/', '/benefits', '/why-yoga', '/about']
+    const darkHeroPages = ['/', '/benefits', '/why-yoga', '/about', '/videos']
     const isDarkHeroPage = darkHeroPages.includes(location.pathname)
 
     useEffect(() => {
@@ -97,7 +97,7 @@ const Header = () => {
                 }`}
         >
             <div className="container-custom">
-                <div className="flex items-center justify-between px-6">
+                <div className="flex items-center justify-between px-4">
                     {/* Logo */}
                     <Link to="/" className="flex items-center space-x-3 group">
                         <img
@@ -140,6 +140,12 @@ const Header = () => {
                             className={`transition-colors font-medium ${textColorClass}`}
                         >
                             About
+                        </Link>
+                        <Link
+                            to="/videos"
+                            className={`transition-colors font-medium ${textColorClass}`}
+                        >
+                            Videos
                         </Link>
                         <Link
                             to="/health-counselor"
@@ -240,6 +246,13 @@ const Header = () => {
                                 onClick={() => setIsMobileMenuOpen(false)}
                             >
                                 About
+                            </Link>
+                            <Link
+                                to="/videos"
+                                className="text-gray-700 hover:text-yoga-sage-600 transition-colors font-medium text-left"
+                                onClick={() => setIsMobileMenuOpen(false)}
+                            >
+                                Videos
                             </Link>
                             <Link
                                 to="/health-counselor"

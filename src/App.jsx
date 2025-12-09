@@ -28,6 +28,7 @@ import FeedbackManagement from './pages/admin/FeedbackManagement'
 import ComponentDemo from './pages/ComponentDemo'
 import HealthCounselor from './pages/HealthCounselor'
 import TestTeacherData from './pages/TestTeacherData'
+import YogaVideos from './pages/YogaVideos'
 
 function AppContent() {
     const location = useLocation()
@@ -44,6 +45,7 @@ function AppContent() {
                     <Route path="/why-yoga" element={<WhyYoga />} />
                     <Route path="/benefits" element={<FitnessBenefits />} />
                     <Route path="/about" element={<AboutUs />} />
+                    <Route path="/videos" element={<YogaVideos />} />
                     <Route path="/health-counselor" element={<HealthCounselor />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/login" element={<Login />} />

@@ -5,6 +5,7 @@ import BenefitsSection from '../components/home/BenefitsSection'
 import WhyYogaSection from '../components/home/WhyYogaSection'
 import TestimonialsSection from '../components/home/TestimonialsSection'
 import YogaTypesSection from '../components/home/YogaTypesSection'
+import TeachersSection from '../components/home/TeachersSection'
 
 const Home = () => {
     return (
@@ -12,6 +13,7 @@ const Home = () => {
             <HeroSection />
             <BenefitsSection />
             <YogaTypesSection />
+            <TeachersSection />
             <WhyYogaSection />
             <TestimonialsSection />
 
