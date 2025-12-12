@@ -1,10 +1,13 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { User, Mail, Phone, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
+import { User, Mail, Phone, Lock, Eye, EyeOff } from 'lucide-react'
 import Button from '../components/ui/Button'
 import Header from '../layouts/Header'
+import { api } from '../services/api'
 
 const Register = () => {
+    const navigate = useNavigate()
+    const [role, setRole] = useState('user') // 'user' or 'teacher'
     const [formData, setFormData] = useState({
         fullName: '',
         email: '',
@@ -14,12 +17,16 @@ const Register = () => {
     })
     const [showPassword, setShowPassword] = useState(false)
     const [errors, setErrors] = useState({})
+    const [isLoading, setIsLoading] = useState(false)
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value })
         // Clear error when user types
         if (errors[e.target.name]) {
             setErrors({ ...errors, [e.target.name]: '' })
+        }
+        if (errors.api) {
+            setErrors({ ...errors, api: '' })
         }
     }
 
@@ -40,12 +47,42 @@ const Register = () => {
         return Object.keys(newErrors).length === 0
     }
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
         if (validate()) {
-            console.log('Registration successful', formData)
-            // Here you would typically call your API
-            alert('Registration successful! (This is a demo)')
+            setIsLoading(true)
+            try {
+                if (role === 'user') {
+                    const userData = {
+                        name: formData.fullName,
+                        email: formData.email,
+                        password: formData.password,
+                        phone: formData.phone
+                    }
+                    const data = await api.registerUser(userData)
+                    localStorage.setItem('userAuth', JSON.stringify(data))
+                    navigate('/dashboard')
+                } else if (role === 'teacher') {
+                    const teacherData = {
+                        name: formData.fullName,
+                        email: formData.email,
+                        password: formData.password,
+                        phone: formData.phone,
+                        // Defaults for new teacher signup
+                        specialization: ['General Yoga'],
+                        id: `TCH${Date.now().toString().slice(-4)}`
+                    }
+                    const data = await api.registerTeacher(teacherData)
+                    localStorage.setItem('teacherAuth', JSON.stringify(data))
+                    localStorage.setItem('teacherEmail', data.email)
+                    navigate('/teacher/dashboard')
+                }
+            } catch (error) {
+                console.error('Registration failed:', error)
+                setErrors({ ...errors, api: error.message })
+            } finally {
+                setIsLoading(false)
+            }
         }
     }
 
@@ -65,12 +102,42 @@ const Register = () => {
                 </div>
 
                 <div className="bg-white/80 backdrop-blur-xl border border-white/50 p-8 md:p-10 rounded-3xl shadow-2xl w-full max-w-md relative z-10 animate-slide-up">
-                    <div className="text-center mb-8">
+                    <div className="text-center mb-6">
                         <h2 className="text-3xl font-display font-bold text-gray-900 mb-2">Create Account</h2>
                         <p className="text-gray-600">Join our global community of wellness</p>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-5">
+                    {/* Role Selector */}
+                    <div className="flex space-x-2 mb-6 p-1 bg-gray-100 rounded-xl">
+                        <button
+                            type="button"
+                            onClick={() => setRole('user')}
+                            className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${role === 'user'
+                                    ? 'bg-white text-yoga-sage-600 shadow-sm'
+                                    : 'text-gray-500 hover:text-gray-700'
+                                }`}
+                        >
+                            I'm a Student
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setRole('teacher')}
+                            className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${role === 'teacher'
+                                    ? 'bg-white text-purple-600 shadow-sm'
+                                    : 'text-gray-500 hover:text-gray-700'
+                                }`}
+                        >
+                            I'm a Teacher
+                        </button>
+                    </div>
+
+                    {errors.api && (
+                        <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg text-center">
+                            {errors.api}
+                        </div>
+                    )}
+
+                    <form onSubmit={handleSubmit} className="space-y-4">
                         {/* Full Name */}
                         <div>
                             <div className="relative">
@@ -168,16 +235,26 @@ const Register = () => {
                             {errors.confirmPassword && <p className="text-red-500 text-xs mt-1 ml-1">{errors.confirmPassword}</p>}
                         </div>
 
-                        <Button className="w-full justify-center mt-6 shadow-lg shadow-yoga-sage-200">
-                            Create Account
+                        <Button
+                            className="w-full justify-center mt-6 shadow-lg shadow-yoga-sage-200"
+                            disabled={isLoading}
+                        >
+                            {isLoading ? (
+                                <span className="flex items-center space-x-2">
+                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                    <span>Creating Account...</span>
+                                </span>
+                            ) : (
+                                <span>Create {role === 'teacher' ? 'Teacher' : 'Student'} Account</span>
+                            )}
                         </Button>
                     </form>
 
-                    <div className="mt-8 text-center">
+                    <div className="mt-8 text-center bg-white/50 rounded-xl p-4">
                         <p className="text-gray-600">
                             Already have an account?{' '}
                             <Link to="/login" className="text-yoga-sage-600 font-bold hover:text-yoga-sage-700 transition-colors">
-                                Login
+                                Login here
                             </Link>
                         </p>
                     </div>

@@ -5,26 +5,76 @@ import Overview from '../components/dashboard/Overview'
 import ScheduleSession from '../components/dashboard/ScheduleSession'
 import Payments from '../components/dashboard/Payments'
 import Feedback from '../components/dashboard/Feedback'
+import { api } from '../services/api'
+
 
 const Dashboard = () => {
     const [activeTab, setActiveTab] = useState('overview')
+    const [bookings, setBookings] = useState([])
+    const [user, setUser] = useState(null)
     const navigate = useNavigate()
 
-    // Simulate auth check
     useEffect(() => {
-        // In a real app, check for token
         window.scrollTo(0, 0)
-    }, [])
+        const userAuth = JSON.parse(localStorage.getItem('userAuth'))
+        if (!userAuth) {
+            navigate('/login')
+            return
+        }
+        setUser(userAuth)
+
+        const fetchBookings = async () => {
+            try {
+                const data = await api.getBookings(userAuth.token)
+                setBookings(data)
+            } catch (error) {
+                console.error('Failed to fetch bookings:', error)
+            }
+        }
+
+        fetchBookings()
+    }, [navigate])
 
     const handleLogout = () => {
-        // Clear auth logic here
+        localStorage.removeItem('userAuth')
         navigate('/login')
     }
 
     const renderContent = () => {
         switch (activeTab) {
-            case 'overview': return <Overview />
-            case 'schedule': return <ScheduleSession />
+            case 'overview':
+                return (
+                    <div>
+                        <Overview />
+                        <div className="mt-8">
+                            <h2 className="text-xl font-bold mb-4">Your Upcoming Sessions</h2>
+                            {bookings.length > 0 ? (
+                                <div className="space-y-4">
+                                    {bookings.map(booking => (
+                                        <div key={booking._id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center">
+                                            <div>
+                                                <h3 className="font-bold text-gray-800">{booking.yogaType}</h3>
+                                                <p className="text-sm text-gray-500">{new Date(booking.date).toLocaleDateString()} at {booking.time}</p>
+                                                <p className="text-sm text-gray-500">Instructor: {booking.teacherName}</p>
+                                            </div>
+                                            <div>
+                                                <span className={`px-3 py-1 rounded-full text-xs font-bold ${booking.status === 'Confirmed' ? 'bg-green-100 text-green-700' :
+                                                    booking.status === 'Pending' ? 'bg-orange-100 text-orange-700' :
+                                                        'bg-gray-100 text-gray-600'
+                                                    }`}>
+                                                    {booking.status}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="text-gray-500 bg-white p-6 rounded-xl text-center">No bookings yet. Schedule your first session!</p>
+                            )}
+                        </div>
+                    </div>
+                )
+            case 'schedule': return <ScheduleSession /> // This component likely has its own logic or static content, fine for now
             case 'payments': return <Payments />
             case 'feedback': return <Feedback />
             default: return <Overview />
@@ -50,8 +100,8 @@ const Dashboard = () => {
                             <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=2070&auto=format&fit=crop" alt="User" className="w-full h-full object-cover" />
                         </div>
                         <div>
-                            <h3 className="font-bold text-gray-900">Sarah Jenkins</h3>
-                            <p className="text-xs text-gray-500">Pro Member</p>
+                            <h3 className="font-bold text-gray-900">{user?.name || 'User'}</h3>
+                            <p className="text-xs text-gray-500">Member</p>
                         </div>
                     </div>
                 </div>
@@ -113,7 +163,7 @@ const Dashboard = () => {
                         <h1 className="text-2xl md:text-3xl font-bold text-gray-900 capitalize">
                             {activeTab.replace('-', ' ')}
                         </h1>
-                        <p className="text-gray-500">Welcome back, Sarah!</p>
+                        <p className="text-gray-500">Welcome back, {user?.name}!</p>
                     </div>
 
                     {renderContent()}

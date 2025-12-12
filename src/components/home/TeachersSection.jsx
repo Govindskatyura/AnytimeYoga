@@ -1,45 +1,30 @@
-import React from 'react'
+
 import { Link } from 'react-router-dom'
 import { Star, ArrowRight } from 'lucide-react'
 import SectionTitle from '../ui/SectionTitle'
 
-const teachers = [
-    {
-        id: 'TCH006',
-        name: 'Abhay Pandey',
-        title: 'Life Coach & Therapeutic Counselor',
-        specialization: ['Life Coaching', 'Counseling', 'Hatha', 'Vinyasa', 'Restorative', 'Meditation'],
-        image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=400&auto=format&fit=crop',
-        rating: 5.0,
-        sessions: '25+',
-        bio: 'Specialized in helping young adults through evidence-based therapy combined with yoga and mindfulness practices.',
-        expertise: ['Addiction Counseling', 'CBT', 'Trauma-Informed Care']
-    },
-    {
-        id: 'TCH001',
-        name: 'Emma Wilson',
-        title: 'Vinyasa & Hatha Specialist',
-        specialization: ['Vinyasa', 'Hatha'],
-        image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=400&auto=format&fit=crop',
-        rating: 4.8,
-        sessions: '45+',
-        bio: 'Expert in flowing sequences that build strength and flexibility while maintaining mindful breathing.',
-        expertise: ['Vinyasa Flow', 'Hatha Yoga', 'Meditation']
-    },
-    {
-        id: 'TCH007',
-        name: 'Priya Sharma',
-        title: 'Power Yoga Expert',
-        specialization: ['Vinyasa', 'Power Yoga'],
-        image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=400&auto=format&fit=crop',
-        rating: 4.9,
-        sessions: '245+',
-        bio: 'Dynamic instructor focusing on building strength, endurance, and inner peace through powerful practice.',
-        expertise: ['Power Yoga', 'Advanced Asanas', 'Strength Building']
-    }
-]
+import { api } from '../../services/api'
+import React, { useState, useEffect } from 'react'
 
 const TeachersSection = () => {
+    const [teachers, setTeachers] = useState([])
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        const fetchTeachers = async () => {
+            try {
+                const data = await api.getTeachers()
+                setTeachers(data)
+            } catch (error) {
+                console.error('Failed to fetch teachers:', error)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fetchTeachers()
+    }, [])
+
     return (
         <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
             <div className="container-custom">

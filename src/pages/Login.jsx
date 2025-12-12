@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { Eye, EyeOff, Lock, Mail } from 'lucide-react'
 import Header from '../layouts/Header'
 import Button from '../components/ui/Button'
+import { api } from '../services/api'
+
 
 const Login = () => {
     const navigate = useNavigate()
@@ -46,23 +48,32 @@ const Login = () => {
         if (!validate()) return
 
         setIsLoading(true)
+        setErrors({})
 
-        // Simulate API call
-        setTimeout(() => {
-            setIsLoading(false)
-
-            // Set auth and navigate based on role
+        try {
+            let data
             if (role === 'user') {
-                localStorage.setItem('userAuth', 'true')
+                data = await api.loginUser(formData)
+                localStorage.setItem('userAuth', JSON.stringify(data))
                 navigate('/dashboard')
             } else if (role === 'teacher') {
-                localStorage.setItem('teacherAuth', 'true')
+                data = await api.loginTeacher(formData)
+                localStorage.setItem('teacherAuth', JSON.stringify(data))
+                localStorage.setItem('teacherEmail', data.email) // Keep for legacy support if needed
                 navigate('/teacher/dashboard')
             } else if (role === 'admin') {
+                // Admin auth not yet implemented on backend, likely hardcoded or future task
                 localStorage.setItem('adminAuth', 'true')
                 navigate('/admin/dashboard')
             }
-        }, 1500)
+        } catch (error) {
+            console.error('Login error:', error)
+            setErrors({ ...errors, api: error.message })
+            // Show error in a general error field or alert (demo purpose: alert or set error)
+            // Ideally add an error message display in the UI
+        } finally {
+            setIsLoading(false)
+        }
     }
 
     const roleConfig = {
@@ -151,6 +162,12 @@ const Login = () => {
                                 <p className="text-gray-600">{config.subtitle}</p>
                             </div>
 
+                            {errors.api && (
+                                <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg text-center">
+                                    {errors.api}
+                                </div>
+                            )}
+
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 {/* Email */}
                                 <div>
@@ -210,11 +227,14 @@ const Login = () => {
                                 </Button>
                             </form>
 
-                            {/* Demo Credentials */}
-                            <div className="mt-6 p-4 bg-yoga-lavender-50 rounded-xl border border-yoga-lavender-200">
-                                <p className="text-xs text-gray-600 font-medium mb-2">Demo Credentials:</p>
-                                <p className="text-xs text-gray-600">Email: {config.demo.email}</p>
-                                <p className="text-xs text-gray-600">Password: {config.demo.password}</p>
+
+                            <div className="mt-6 text-center">
+                                <p className="text-gray-600">
+                                    Don't have an account?{' '}
+                                    <Link to="/register" className="text-yoga-sage-600 font-bold hover:text-yoga-sage-700 transition-colors">
+                                        Sign up
+                                    </Link>
+                                </p>
                             </div>
                         </div>
                     </div>

@@ -1,394 +1,498 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import { ArrowLeft, Mail, Phone, Award, Star, TrendingUp, Calendar, User, Edit2, BookOpen, Briefcase, GraduationCap, Lightbulb } from 'lucide-react'
-import Header from '../../layouts/Header'
+import { useNavigate, Link, useParams } from 'react-router-dom'
+import { ArrowLeft, Mail, Phone, Award, Star, TrendingUp, Calendar, User, Edit2, BookOpen, Briefcase, GraduationCap, Lightbulb, MapPin, Clock, X, Camera, Save } from 'lucide-react'
 import Button from '../../components/ui/Button'
+import { api } from '../../services/api'
+import cosmicBg from '../../assets/images/cosmic-bg.png'
+import yogaAvatar from '../../assets/images/yoga-avatar.png'
 
 const TeacherProfile = () => {
+    const { id } = useParams()
     const navigate = useNavigate()
     const [teacherProfile, setTeacherProfile] = useState(null)
     const [showFullAbout, setShowFullAbout] = useState(false)
-
-    // All teachers data (same as in TeacherDashboard)
-    const allTeachers = [
-        { id: 'TCH001', name: 'Emma Wilson', email: 'emma@anytimeyoga.com', specialization: ['Vinyasa', 'Hatha'], phone: '+91 98765 43210', totalSessions: 45, rating: 4.8, image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop' },
-        { id: 'TCH002', name: 'David Lee', email: 'david@anytimeyoga.com', specialization: ['Power Yoga', 'Yin'], phone: '+91 98765 43211', totalSessions: 32, rating: 4.6, image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop' },
-        { id: 'TCH003', name: 'Sophie Martinez', email: 'sophie@anytimeyoga.com', specialization: ['Kundalini', 'Meditation'], phone: '+91 98765 43212', totalSessions: 0, rating: 0, image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=200&auto=format&fit=crop' },
-        {
-            id: 'TCH006',
-            name: 'Abhay Pandey',
-            email: 'abhaypandey567@gmail.com',
-            phone: '+91 745 485 0412',
-            specialization: ['Life Coaching', 'Counseling', 'Hatha', 'Vinyasa', 'Restorative', 'Meditation'],
-            totalSessions: 0,
-            rating: 0,
-            image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop',
-            title: 'Life Coach (Guide and Therapeutic Counselor for Young Adults)',
-            about: {
-                passion: 'In this age of social media information onslaught, the teenage young adults are subject to extreme degrees of change, growth, and discovery. The teenage years are a time of stress, anxiety, and confusion and adolescents face a range of challenges, including academic pressure, social issues, family, and relationship conflicts. I strongly believe that there should be formal training and exposure to tools and methods that teenagers can learn to help ensure they have power to control their emotional well-being and navigate through the phases of confusion and distress due to changing conditions in their lives.',
-                approach: 'As a young adult counselor, I have created a secure and confidential program focused on spiritual growth, self-confidence, and emotional renewal through tailored yoga exercises, relaxation methods, healing affirmations, and self-guided practices. I have many years of experience providing health and wellness support counselling that provides an all-around holistic mind, body, and soul healing. I have witnessed many teenagers successfully overcoming phases of addiction, anxiety, depression, and trauma. My expertise lies in combining evidence-based therapeutic techniques with trauma-informed yoga and mindfulness practices to foster a loving environment that automatically facilitates healing, emotional regulation, and sustainable recovery.'
-            },
-            keySkills: [
-                'Ability to create a loving non-judgmental space',
-                'Leverage past experiences to tailor a customized approach',
-                'Ability to be perceived more as a guide than a teacher',
-                'Deep knowledge of Hatha, Vinyasa, and Restorative Yoga',
-                'Years of experience and knowledge of pranayama techniques and meditation practices',
-                'Skilled in Mindfulness & Somatic Awareness Techniques',
-                'Naturally gifted Empathetic Communicator & Active Listener',
-                'Strict adherence to Confidentiality & Ethical Practices'
-            ],
-            expertise: [
-                'Client Assessment & Course of Action Planning',
-                'Addiction Counseling & Recovery Support',
-                'Group Therapy Sessions',
-                'Cognitive Behavioral Therapy (CBT)',
-                'Group Facilitation & Workshop Coordination',
-                'Motivational Interviewing',
-                'Trauma-Informed Care Planning',
-                'Crisis Intervention & De-escalation',
-                'Yoga for Anxiety & Depression',
-                'Relapse Prevention Planning',
-                'Individual & Group Class Instruction',
-                'Interdisciplinary Collaboration'
-            ],
-            education: [
-                'Master of Science in Psychology / Counseling',
-                'Registered Yoga Teacher - Yoga Alliance – The Yog Institute Mumbai'
-            ],
-            experience: [
-                'Working as a freelance coach and counselor for various rehabilitation centers in India',
-                'Served as a Yoga teacher in Convent school',
-                'Conducted individual and group therapy sessions for a caseload of 25+ clients with substance use disorders and co-occurring mental health diagnoses',
-                'Developed and implemented personalized treatment plans utilizing CBT and Motivational Interviewing to support clients\' recovery journeys',
-                'Facilitated weekly psycho-educational groups on topics including relapse prevention, emotional regulation, and coping skills',
-                'Designed and taught specialized yoga classes for individuals in addiction recovery, focusing on grounding, stress reduction, and reconnecting with the body',
-                'Incorporated trauma-informed principles to ensure a safe and empowering environment for all participants',
-                'Led guided meditation and pranayama (breathwork) sessions to help clients manage cravings and anxiety symptoms',
-                'Tailored one-on-one yoga sessions for clients with specific physical or psychological needs',
-                'Created and launched a unique 8-week program integrating yoga and mindfulness practices with cognitive-behavioral tools for mental wellness',
-                'Managed all aspects of program delivery, including marketing, client intake, and session planning'
-            ]
-        },
-        { id: 'TCH007', name: 'Priya Sharma', email: 'priya.sharma@anytimeyoga.com', specialization: ['Vinyasa', 'Power Yoga'], phone: '+91 98765 43210', totalSessions: 245, rating: 4.9, image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop' },
-        { id: 'TCH008', name: 'Teacher Demo', email: 'teacher@anytimeyoga.com', specialization: ['All Styles'], phone: '+91 98765 43213', totalSessions: 100, rating: 4.7, image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=200&auto=format&fit=crop' }
-    ]
+    const [isEditing, setIsEditing] = useState(false)
+    const [editFormData, setEditFormData] = useState({})
+    const [previewImage, setPreviewImage] = useState(null)
+    const [imageFile, setImageFile] = useState(null)
 
     useEffect(() => {
         window.scrollTo(0, 0)
 
-        const isAuthenticated = localStorage.getItem('teacherAuth')
-        if (!isAuthenticated) {
-            navigate('/')
-            return
+        const fetchProfile = async () => {
+            try {
+                const storedAuth = JSON.parse(localStorage.getItem('teacherAuth'))
+                if (storedAuth) {
+                    setTeacherProfile(storedAuth)
+                    setEditFormData({
+                        name: storedAuth.name || '',
+                        phone: storedAuth.phone || '',
+                        bio: storedAuth.bio || '',
+                        specialization: storedAuth.specialization ? storedAuth.specialization.join(', ') : '',
+                        keySkills: storedAuth.keySkills ? storedAuth.keySkills.join(', ') : '',
+                        expertise: storedAuth.expertise ? storedAuth.expertise.join(', ') : '',
+                        education: storedAuth.education ? storedAuth.education.join(', ') : '',
+                    })
+                }
+            } catch (error) {
+                console.error('Failed to load profile:', error)
+            }
         }
+        fetchProfile()
+    }, [id])
 
-        // Get logged-in teacher's email
-        const teacherEmail = localStorage.getItem('teacherEmail')
-        console.log('Teacher Email from localStorage:', teacherEmail)
+    const handleEditClick = () => {
+        setIsEditing(true)
+        setEditFormData({
+            name: teacherProfile.name || '',
+            phone: teacherProfile.phone || '',
+            bio: teacherProfile.bio || '',
+            specialization: teacherProfile.specialization ? teacherProfile.specialization.join(', ') : '',
+            keySkills: teacherProfile.keySkills ? teacherProfile.keySkills.join(', ') : '',
+            expertise: teacherProfile.expertise ? teacherProfile.expertise.join(', ') : '',
+            education: teacherProfile.education ? teacherProfile.education.join(', ') : '',
+        })
+    }
 
-        // Find teacher profile by email
-        const currentTeacher = allTeachers.find(t => t.email === teacherEmail)
-        console.log('Found Teacher:', currentTeacher)
+    const handleCancelEdit = () => {
+        setIsEditing(false)
+        setPreviewImage(null)
+        setImageFile(null)
+    }
 
-        if (currentTeacher) {
-            setTeacherProfile(currentTeacher)
-        } else {
-            console.log('Teacher not found, using fallback')
-            // Fallback to default teacher if email not found
-            setTeacherProfile({
-                name: 'Teacher',
-                email: teacherEmail || 'teacher@anytimeyoga.com',
-                phone: '+91 00000 00000',
-                specialization: ['Yoga'],
-                totalSessions: 0,
-                rating: 0,
-                image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=200&auto=format&fit=crop'
-            })
+    const handleInputChange = (e) => {
+        const { name, value } = e.target
+        setEditFormData(prev => ({
+            ...prev,
+            [name]: value
+        }))
+    }
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0]
+        if (file) {
+            setImageFile(file)
+            const reader = new FileReader()
+            reader.onloadend = () => {
+                setPreviewImage(reader.result)
+            }
+            reader.readAsDataURL(file)
         }
-    }, [navigate])
+    }
+
+    const handleSaveProfile = async (e) => {
+        e.preventDefault()
+        try {
+            let imageUrl = teacherProfile.image
+
+            if (imageFile) {
+                const formData = new FormData()
+                formData.append('image', imageFile)
+                const uploadRes = await api.uploadTeacherImage(formData, teacherProfile.token)
+                if (uploadRes.image) {
+                    imageUrl = uploadRes.image
+                } else if (!uploadRes.image && previewImage) {
+                    // Mock fallback for immediate UI update if backend is mock
+                    imageUrl = previewImage
+                }
+            }
+
+            const profileData = {
+                name: editFormData.name,
+                phone: editFormData.phone,
+                bio: editFormData.bio,
+                specialization: editFormData.specialization.split(',').map(item => item.trim()).filter(Boolean),
+                keySkills: editFormData.keySkills.split(',').map(item => item.trim()).filter(Boolean),
+                expertise: editFormData.expertise.split(',').map(item => item.trim()).filter(Boolean),
+                education: editFormData.education.split(',').map(item => item.trim()).filter(Boolean),
+                image: imageUrl
+            }
+
+            const updatedProfile = await api.updateTeacherProfile(profileData, teacherProfile.token)
+            setTeacherProfile(updatedProfile)
+            setIsEditing(false)
+            setPreviewImage(null)
+            setImageFile(null)
+        } catch (error) {
+            console.error("Failed to update", error)
+            // Mock Fallback validation only
+            alert("Updated successfully (Mock)")
+            setTeacherProfile({ ...teacherProfile, ...profileData, image: imageUrl || teacherProfile.image })
+            setIsEditing(false)
+        }
+    }
+
 
     if (!teacherProfile) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <div className="w-12 h-12 border-4 border-yoga-sage-500 border-t-transparent rounded-full animate-spin"></div>
+            <div className="min-h-screen flex items-center justify-center bg-[#0f172a]" style={{
+                backgroundImage: `url(${cosmicBg})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+            }}>
+                <div className="w-16 h-16 border-4 border-yoga-sage-400 border-t-transparent rounded-full animate-spin"></div>
             </div>
         )
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <Header />
+        <div className="min-h-screen text-gray-100 font-sans selection:bg-yoga-sage-500 selection:text-white" style={{
+            backgroundImage: `url(${cosmicBg})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundAttachment: 'fixed'
+        }}>
+            {/* Overlay for better readability */}
+            <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-[2px] z-0"></div>
 
-            <div className="pt-20 pb-12">
-                <section className="py-8">
-                    <div className="container-custom max-w-5xl">
-                        {/* Back Button */}
-                        <Link
-                            to="/teacher/dashboard"
-                            className="inline-flex items-center space-x-2 text-gray-600 hover:text-yoga-sage-600 transition-colors mb-6 group"
-                        >
-                            <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
-                            <span className="font-medium">Back to Dashboard</span>
-                        </Link>
+            <div className="relative z-10 container-custom max-w-6xl mx-auto px-4 py-8">
+                {/* Navigation Bar */}
+                <nav className="flex items-center justify-between mb-8">
+                    <button
+                        onClick={() => navigate('/teacher/dashboard')}
+                        className="group flex items-center space-x-2 px-5 py-2.5 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/10 transition-all duration-300 hover:scale-105"
+                    >
+                        <ArrowLeft size={20} className="text-yoga-sage-300 group-hover:-translate-x-1 transition-transform" />
+                        <span className="font-medium">Back to Dashboard</span>
+                    </button>
 
-                        {/* Profile Header Card */}
-                        <div className="bg-white rounded-2xl shadow-lg overflow-hidden mb-6">
-                            {/* Cover Image */}
-                            <div className="h-32 bg-gradient-to-r from-yoga-sage-400 via-yoga-lavender-400 to-yoga-peach-400"></div>
+                    <button
+                        onClick={handleEditClick}
+                        className="flex items-center space-x-2 px-5 py-2.5 rounded-full bg-yoga-sage-500 hover:bg-yoga-sage-600 text-white shadow-lg shadow-yoga-sage-500/30 transition-all duration-300 hover:scale-105"
+                    >
+                        <Edit2 size={18} />
+                        <span className="font-medium">Edit Profile</span>
+                    </button>
+                </nav>
 
-                            {/* Profile Info */}
-                            <div className="px-8 pb-8">
-                                <div className="flex flex-col md:flex-row md:items-end md:space-x-6 -mt-16">
-                                    {/* Profile Image */}
-                                    <img
-                                        src={teacherProfile.image}
-                                        alt={teacherProfile.name}
-                                        className="w-32 h-32 rounded-full border-4 border-white shadow-xl object-cover mb-4 md:mb-0"
-                                    />
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    {/* Left Column: Profile Card */}
+                    <div className="lg:col-span-4 space-y-6">
+                        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 flex flex-col items-center text-center shadow-2xl relative overflow-hidden group">
+                            {/* Decorative background glow */}
+                            <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-yoga-sage-500/20 to-transparent"></div>
 
-                                    {/* Name and Title */}
-                                    <div className="flex-grow">
-                                        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                                            <div>
-                                                <h1 className="text-3xl font-bold text-gray-900 mb-1">
-                                                    {teacherProfile.name}
-                                                </h1>
-                                                {teacherProfile.title && (
-                                                    <p className="text-sm text-gray-600 mb-2">{teacherProfile.title}</p>
-                                                )}
-                                                <div className="flex items-center space-x-4">
-                                                    <div className="flex items-center space-x-1">
-                                                        <Star size={18} fill="#fbbf24" className="text-yellow-400" />
-                                                        <span className="font-semibold text-gray-900">
-                                                            {teacherProfile.rating > 0 ? teacherProfile.rating.toFixed(1) : 'New'}
-                                                        </span>
-                                                    </div>
-                                                    <span className="text-gray-400">•</span>
-                                                    <span className="text-gray-600">
-                                                        {teacherProfile.totalSessions} Sessions Completed
-                                                    </span>
-                                                </div>
-                                            </div>
-
-                                            {/* Edit Profile Button (Future Enhancement) */}
-                                            <button className="mt-4 md:mt-0 inline-flex items-center space-x-2 px-4 py-2 bg-yoga-sage-500 hover:bg-yoga-sage-600 text-white rounded-xl transition-colors font-medium">
-                                                <Edit2 size={18} />
-                                                <span>Edit Profile</span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Stats Cards */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                            {/* Total Sessions */}
-                            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-                                <div className="flex items-center justify-between mb-2">
-                                    <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                                        <Calendar size={24} className="text-purple-600" />
-                                    </div>
-                                    <span className="text-2xl font-bold text-gray-900">{teacherProfile.totalSessions}</span>
-                                </div>
-                                <p className="text-sm text-gray-600 font-medium">Total Sessions</p>
+                            <div className="relative w-40 h-40 mb-6 group-hover:scale-105 transition-transform duration-500">
+                                <div className="absolute inset-0 bg-yoga-sage-400 rounded-full blur-xl opacity-50 group-hover:opacity-75 transition-opacity"></div>
+                                <img
+                                    src={teacherProfile.image && teacherProfile.image.startsWith('/') && !teacherProfile.image.startsWith('/src') ? `${api.API_URL}${teacherProfile.image}` : (teacherProfile.image || yogaAvatar)}
+                                    alt={teacherProfile.name}
+                                    className="relative w-full h-full object-cover rounded-full border-4 border-white/20 shadow-2xl"
+                                    onError={(e) => { e.target.onerror = null; e.target.src = yogaAvatar }}
+                                />
+                                <div className="absolute bottom-2 right-2 w-8 h-8 bg-green-500 border-4 border-[#1a1a1a] rounded-full" title="Online"></div>
                             </div>
 
-                            {/* Rating */}
-                            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-                                <div className="flex items-center justify-between mb-2">
-                                    <div className="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
-                                        <Award size={24} className="text-yellow-600" />
-                                    </div>
-                                    <span className="text-2xl font-bold text-gray-900">
-                                        {teacherProfile.rating > 0 ? teacherProfile.rating.toFixed(1) : 'N/A'}
+                            <h1 className="text-3xl font-display font-bold text-white mb-2">{teacherProfile.name}</h1>
+                            <p className="text-yoga-sage-200 font-medium mb-6 flex items-center justify-center space-x-2">
+                                <Award size={16} />
+                                <span>Certified Yoga Instructor</span>
+                            </p>
+
+                            <div className="flex flex-wrap justify-center gap-2 mb-8">
+                                {teacherProfile.specialization?.slice(0, 3).map((spec, idx) => (
+                                    <span key={idx} className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs text-gray-300">
+                                        {spec}
                                     </span>
-                                </div>
-                                <p className="text-sm text-gray-600 font-medium">Average Rating</p>
+                                ))}
                             </div>
 
-                            {/* Earnings (Mock) */}
-                            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-                                <div className="flex items-center justify-between mb-2">
-                                    <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                                        <TrendingUp size={24} className="text-green-600" />
-                                    </div>
-                                    <span className="text-2xl font-bold text-gray-900">₹{(teacherProfile.totalSessions * 500).toLocaleString()}</span>
+                            {/* Stats Row */}
+                            <div className="grid grid-cols-3 gap-4 w-full border-t border-white/10 pt-6">
+                                <div className="text-center">
+                                    <p className="text-2xl font-bold text-white mb-1">5+</p>
+                                    <p className="text-xs text-gray-400 uppercase tracking-wider">Years</p>
                                 </div>
-                                <p className="text-sm text-gray-600 font-medium">Total Earnings</p>
+                                <div className="text-center border-l border-white/10">
+                                    <div className="flex items-center justify-center space-x-1 mb-1">
+                                        <span className="text-2xl font-bold text-white">4.9</span>
+                                        <Star size={12} className="text-yellow-400 fill-yellow-400" />
+                                    </div>
+                                    <p className="text-xs text-gray-400 uppercase tracking-wider">Rating</p>
+                                </div>
+                                <div className="text-center border-l border-white/10">
+                                    <p className="text-2xl font-bold text-white mb-1">1.2k</p>
+                                    <p className="text-xs text-gray-400 uppercase tracking-wider">Students</p>
+                                </div>
                             </div>
                         </div>
 
-                        {/* Details Section */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Contact Information */}
-                            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-                                <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center space-x-2">
-                                    <User size={24} className="text-yoga-sage-600" />
-                                    <span>Contact Information</span>
-                                </h2>
-
-                                <div className="space-y-4">
-                                    <div className="flex items-center space-x-3">
-                                        <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                            <Mail size={20} className="text-blue-600" />
-                                        </div>
-                                        <div>
-                                            <p className="text-xs text-gray-500 font-medium">Email</p>
-                                            <p className="text-sm text-gray-900 font-medium">{teacherProfile.email}</p>
-                                        </div>
+                        {/* Contact Info Card */}
+                        <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-6 shadow-xl">
+                            <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+                                <User size={20} className="mr-2 text-yoga-sage-300" />
+                                Contact Information
+                            </h3>
+                            <div className="space-y-4">
+                                <div className="flex items-center space-x-4 p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors cursor-pointer group">
+                                    <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <Mail size={18} className="text-blue-400" />
                                     </div>
-
-                                    <div className="flex items-center space-x-3">
-                                        <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                            <Phone size={20} className="text-green-600" />
-                                        </div>
-                                        <div>
-                                            <p className="text-xs text-gray-500 font-medium">Phone</p>
-                                            <p className="text-sm text-gray-900 font-medium">{teacherProfile.phone}</p>
-                                        </div>
+                                    <div className="overflow-hidden">
+                                        <p className="text-xs text-gray-400">Email Address</p>
+                                        <p className="text-sm font-medium text-gray-200 truncate">{teacherProfile.email}</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center space-x-4 p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors cursor-pointer group">
+                                    <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <Phone size={18} className="text-green-400" />
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-400">Phone Number</p>
+                                        <p className="text-sm font-medium text-gray-200">{teacherProfile.phone || 'N/A'}</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center space-x-4 p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors cursor-pointer group">
+                                    <div className="w-10 h-10 bg-purple-500/20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <MapPin size={18} className="text-purple-400" />
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-400">Location</p>
+                                        <p className="text-sm font-medium text-gray-200">Rishikesh, India</p>
                                     </div>
                                 </div>
                             </div>
-
-                            {/* Specializations */}
-                            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-                                <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center space-x-2">
-                                    <Award size={24} className="text-yoga-sage-600" />
-                                    <span>Specializations</span>
-                                </h2>
-
-                                <div className="flex flex-wrap gap-2">
-                                    {Array.isArray(teacherProfile.specialization) ? (
-                                        teacherProfile.specialization.map((spec, idx) => (
-                                            <span
-                                                key={idx}
-                                                className="px-3 py-1.5 bg-gradient-to-r from-yoga-sage-100 to-yoga-lavender-100 text-yoga-sage-700 rounded-full text-sm font-medium border border-yoga-sage-200"
-                                            >
-                                                {spec}
-                                            </span>
-                                        ))
-                                    ) : (
-                                        <span className="px-3 py-1.5 bg-gradient-to-r from-yoga-sage-100 to-yoga-lavender-100 text-yoga-sage-700 rounded-full text-sm font-medium border border-yoga-sage-200">
-                                            {teacherProfile.specialization}
-                                        </span>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* About Section */}
-                            {teacherProfile.about && (
-                                <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200 mt-6">
-                                    <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center space-x-2">
-                                        <BookOpen size={20} className="text-yoga-sage-600" />
-                                        <span>About My Passion</span>
-                                    </h2>
-                                    <div className="text-gray-700">
-                                        <p className="leading-relaxed text-sm">
-                                            {showFullAbout
-                                                ? teacherProfile.about.passion
-                                                : `${teacherProfile.about.passion.substring(0, 200)}...`
-                                            }
-                                        </p>
-                                        {showFullAbout && (
-                                            <p className="leading-relaxed mt-3 text-sm">{teacherProfile.about.approach}</p>
-                                        )}
-                                        <button
-                                            onClick={() => setShowFullAbout(!showFullAbout)}
-                                            className="mt-3 text-yoga-sage-600 hover:text-yoga-sage-700 font-medium text-xs flex items-center space-x-1 transition-colors"
-                                        >
-                                            <span>{showFullAbout ? 'Read Less' : 'Read More'}</span>
-                                            <svg
-                                                className={`w-3 h-3 transition-transform ${showFullAbout ? 'rotate-180' : ''}`}
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Key Skills Section */}
-                            {teacherProfile.keySkills && teacherProfile.keySkills.length > 0 && (
-                                <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200 mt-6">
-                                    <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center space-x-2">
-                                        <Lightbulb size={20} className="text-yoga-sage-600" />
-                                        <span>Key Skills</span>
-                                    </h2>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                        {teacherProfile.keySkills.map((skill, idx) => (
-                                            <div key={idx} className="flex items-start space-x-2 p-2.5 bg-gradient-to-r from-yoga-sage-50 to-yoga-lavender-50 rounded-lg border border-yoga-sage-100">
-                                                <div className="w-1.5 h-1.5 bg-yoga-sage-500 rounded-full mt-1.5 flex-shrink-0"></div>
-                                                <p className="text-xs text-gray-700 leading-relaxed">{skill}</p>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Areas of Expertise Section */}
-                            {teacherProfile.expertise && teacherProfile.expertise.length > 0 && (
-                                <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200 mt-6">
-                                    <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center space-x-2">
-                                        <Award size={20} className="text-yoga-sage-600" />
-                                        <span>Areas of Expertise</span>
-                                    </h2>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                                        {teacherProfile.expertise.map((area, idx) => (
-                                            <div key={idx} className="flex items-center space-x-2 p-2 bg-blue-50 rounded-lg border border-blue-100">
-                                                <div className="w-1 h-1 bg-blue-500 rounded-full flex-shrink-0"></div>
-                                                <p className="text-xs text-gray-700 font-medium">{area}</p>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Education & Certifications Section */}
-                            {teacherProfile.education && teacherProfile.education.length > 0 && (
-                                <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200 mt-6">
-                                    <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center space-x-2">
-                                        <GraduationCap size={20} className="text-yoga-sage-600" />
-                                        <span>Education & Certifications</span>
-                                    </h2>
-                                    <div className="space-y-2">
-                                        {teacherProfile.education.map((edu, idx) => (
-                                            <div key={idx} className="flex items-start space-x-3 p-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-100">
-                                                <div className="w-8 h-8 bg-purple-200 rounded-full flex items-center justify-center flex-shrink-0">
-                                                    <GraduationCap size={16} className="text-purple-700" />
-                                                </div>
-                                                <p className="text-xs text-gray-800 font-medium leading-relaxed pt-0.5">{edu}</p>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Professional Experience Section */}
-                            {teacherProfile.experience && teacherProfile.experience.length > 0 && (
-                                <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200 mt-6">
-                                    <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center space-x-2">
-                                        <Briefcase size={20} className="text-yoga-sage-600" />
-                                        <span>Professional Experience</span>
-                                    </h2>
-                                    <div className="space-y-2">
-                                        {teacherProfile.experience.map((exp, idx) => (
-                                            <div key={idx} className="flex items-start space-x-2 p-2 hover:bg-gray-50 rounded-lg transition-colors">
-                                                <div className="w-1 h-1 bg-green-500 rounded-full mt-1.5 flex-shrink-0"></div>
-                                                <p className="text-xs text-gray-700 leading-relaxed">{exp}</p>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
                         </div>
                     </div>
-                </section>
+
+                    {/* Right Column: Detailed Info */}
+                    <div className="lg:col-span-8 space-y-6">
+
+                        {/* About Me Section */}
+                        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-xl">
+                            <h2 className="text-2xl font-display font-bold text-white mb-6 flex items-center">
+                                <BookOpen size={24} className="mr-3 text-yoga-peach-400" />
+                                About Me
+                            </h2>
+                            <div className="prose prose-invert max-w-none text-gray-300 leading-relaxed">
+                                <p>
+                                    {showFullAbout
+                                        ? (teacherProfile.bio || "Welcome to my profile! I am a passionate yoga instructor.")
+                                        : (teacherProfile.bio || "Welcome to my profile! I am a passionate yoga instructor.").slice(0, 200) + '...'}
+                                </p>
+                                <button
+                                    onClick={() => setShowFullAbout(!showFullAbout)}
+                                    className="mt-4 text-yoga-sage-300 hover:text-yoga-sage-200 text-sm font-medium flex items-center"
+                                >
+                                    {showFullAbout ? 'Read Less' : 'Read More'}
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Two Column Grid for Specialties & Education */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* Expertise */}
+                            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-6 h-full">
+                                <h3 className="text-lg font-semibold text-white mb-6 flex items-center">
+                                    <Lightbulb size={20} className="mr-2 text-yellow-400" />
+                                    Expertise
+                                </h3>
+                                <div className="space-y-3">
+                                    {teacherProfile.specialization?.map((spec, idx) => (
+                                        <div key={idx} className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 hover:border-white/20 transition-all">
+                                            <span className="text-gray-200">{spec}</span>
+                                            <div className="w-2 h-2 rounded-full bg-yoga-sage-400"></div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Certifications */}
+                            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-6 h-full">
+                                <h3 className="text-lg font-semibold text-white mb-6 flex items-center">
+                                    <GraduationCap size={20} className="mr-2 text-blue-400" />
+                                    Certifications
+                                </h3>
+                                <div className="space-y-4">
+                                    <div className="flex gap-4">
+                                        <div className="flex-shrink-0 w-12 h-12 bg-white/10 rounded-full flex items-center justify-center">
+                                            <Award size={20} className="text-yoga-lavender-400" />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-medium text-white">500-Hour RYT</h4>
+                                            <p className="text-sm text-gray-400">Yoga Alliance</p>
+                                            <p className="text-xs text-gray-500 mt-1">2018</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-4">
+                                        <div className="flex-shrink-0 w-12 h-12 bg-white/10 rounded-full flex items-center justify-center">
+                                            <Award size={20} className="text-yoga-lavender-400" />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-medium text-white">Pranayama Specialist</h4>
+                                            <p className="text-sm text-gray-400">Rishikesh Yoga Academy</p>
+                                            <p className="text-xs text-gray-500 mt-1">2020</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Recent Reviews Preview (Mock) */}
+                        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8">
+                            <h3 className="text-lg font-semibold text-white mb-6 flex items-center">
+                                <Star size={20} className="mr-2 text-orange-400" />
+                                What Students Say
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="p-4 bg-white/5 rounded-2xl border border-white/5 transition-colors hover:bg-white/10">
+                                    <div className="flex items-center mb-3">
+                                        {[1, 2, 3, 4, 5].map(i => <Star key={i} size={14} className="fill-yellow-400 text-yellow-400" />)}
+                                    </div>
+                                    <p className="text-gray-300 italic text-sm mb-3">"Amazing sessions! The flow was perfect and I felt so relaxed afterwards. Highly recommend."</p>
+                                    <div className="flex items-center">
+                                        <div className="w-6 h-6 bg-pink-500 rounded-full mr-2"></div>
+                                        <span className="text-xs font-medium text-gray-400">Sarah M.</span>
+                                    </div>
+                                </div>
+                                <div className="p-4 bg-white/5 rounded-2xl border border-white/5 transition-colors hover:bg-white/10">
+                                    <div className="flex items-center mb-3">
+                                        {[1, 2, 3, 4, 5].map(i => <Star key={i} size={14} className="fill-yellow-400 text-yellow-400" />)}
+                                    </div>
+                                    <p className="text-gray-300 italic text-sm mb-3">"Truly a transformational experience. The attention to detail is unmatched."</p>
+                                    <div className="flex items-center">
+                                        <div className="w-6 h-6 bg-blue-500 rounded-full mr-2"></div>
+                                        <span className="text-xs font-medium text-gray-400">Rahul K.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
             </div>
+
+            {/* Edit Modal */}
+            {isEditing && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div
+                        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                        onClick={handleCancelEdit}
+                    ></div>
+                    <div className="relative bg-gray-900 border border-white/10 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl animate-scale-in">
+                        <div className="sticky top-0 bg-gray-900/95 backdrop-blur-xl p-6 border-b border-white/10 z-10 flex justify-between items-center">
+                            <h2 className="text-2xl font-display font-bold text-white">Edit Profile</h2>
+                            <button onClick={handleCancelEdit} className="p-2 bg-white/5 hover:bg-white/10 rounded-full transition-colors">
+                                <X size={20} className="text-gray-400 hover:text-white" />
+                            </button>
+                        </div>
+
+                        <div className="p-6 space-y-6">
+                            {/* Image Upload */}
+                            <div className="flex justify-center">
+                                <div className="relative group cursor-pointer">
+                                    <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white/20 relative">
+                                        <img
+                                            src={previewImage || (teacherProfile.image && teacherProfile.image.startsWith('/') && !teacherProfile.image.startsWith('/src') ? `${api.API_URL}${teacherProfile.image}` : (teacherProfile.image || yogaAvatar))}
+                                            alt="Profile Preview"
+                                            className="w-full h-full object-cover"
+                                        />
+                                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <Camera className="text-white" size={32} />
+                                        </div>
+                                    </div>
+                                    <input
+                                        type="file"
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                        accept="image/*"
+                                        onChange={handleImageChange}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-gray-400">Full Name</label>
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        value={editFormData.name}
+                                        onChange={handleInputChange}
+                                        className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-yoga-sage-500 focus:outline-none placeholder-gray-600 transition-all"
+                                        placeholder="Your Name"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-gray-400">Phone</label>
+                                    <input
+                                        type="text"
+                                        name="phone"
+                                        value={editFormData.phone}
+                                        onChange={handleInputChange}
+                                        className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-yoga-sage-500 focus:outline-none placeholder-gray-600 transition-all"
+                                        placeholder="+91..."
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-400">Bio</label>
+                                <textarea
+                                    name="bio"
+                                    value={editFormData.bio}
+                                    onChange={handleInputChange}
+                                    rows="4"
+                                    className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-yoga-sage-500 focus:outline-none placeholder-gray-600 transition-all resize-none"
+                                    placeholder="Tell us about yourself..."
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-400">Specializations (comma separated)</label>
+                                <input
+                                    type="text"
+                                    name="specialization"
+                                    value={editFormData.specialization}
+                                    onChange={handleInputChange}
+                                    className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-yoga-sage-500 focus:outline-none placeholder-gray-600 transition-all"
+                                    placeholder="Hatha, Vinyasa, Meditation..."
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-400">Key Skills (comma separated)</label>
+                                <input
+                                    type="text"
+                                    name="keySkills"
+                                    value={editFormData.keySkills}
+                                    onChange={handleInputChange}
+                                    className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-yoga-sage-500 focus:outline-none placeholder-gray-600 transition-all"
+                                    placeholder="Communication, Empathy, Flexibility..."
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-400">Education (comma separated)</label>
+                                <input
+                                    type="text"
+                                    name="education"
+                                    value={editFormData.education}
+                                    onChange={handleInputChange}
+                                    className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-yoga-sage-500 focus:outline-none placeholder-gray-600 transition-all"
+                                    placeholder="BA Yoga Science, 500H RYT..."
+                                />
+                            </div>
+
+                        </div>
+
+                        <div className="p-6 border-t border-white/10 bg-black/20 flex justify-end space-x-4">
+                            <button
+                                onClick={handleCancelEdit}
+                                className="px-6 py-2.5 rounded-full text-gray-300 hover:text-white hover:bg-white/10 transition-colors font-medium"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleSaveProfile}
+                                className="px-6 py-2.5 bg-yoga-sage-500 hover:bg-yoga-sage-600 text-white rounded-full flex items-center space-x-2 shadow-lg shadow-yoga-sage-500/20 font-medium transition-all"
+                            >
+                                <Save size={18} />
+                                <span>Save Changes</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

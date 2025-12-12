@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { Calendar, Clock, User, Activity } from 'lucide-react'
 import Header from '../layouts/Header'
 import PaymentForm from '../components/payment/PaymentForm'
+import { api } from '../services/api'
 
 const Payment = () => {
     const navigate = useNavigate()
@@ -25,16 +26,42 @@ const Payment = () => {
         setBookingData(data)
     }, [location])
 
-    const handlePaymentComplete = (paymentDetails) => {
-        // Navigate to invoice with booking and payment details
-        navigate('/invoice/' + Date.now(), {
-            state: {
-                booking: bookingData,
-                payment: paymentDetails,
-                invoiceNumber: 'INV-' + Date.now(),
-                invoiceDate: new Date().toISOString()
+    const handlePaymentComplete = async (paymentDetails) => {
+        try {
+            // Get user token
+            const userAuth = JSON.parse(localStorage.getItem('userAuth'))
+
+            if (!userAuth || !userAuth.token) {
+                alert('Please login to complete booking')
+                navigate('/login')
+                return
             }
-        })
+
+            const bookingPayload = {
+                teacherId: bookingData.instructorId || 'TCH001', // Should come from generic teacher unless specific
+                teacherName: bookingData.instructor,
+                date: bookingData.date,
+                time: bookingData.time,
+                yogaType: bookingData.yogaType,
+                amount: bookingData.price,
+                paymentId: paymentDetails.id || 'PAY' + Date.now()
+            }
+
+            await api.createBooking(bookingPayload, userAuth.token)
+
+            // Navigate to invoice with booking and payment details
+            navigate('/invoice/' + Date.now(), {
+                state: {
+                    booking: bookingData,
+                    payment: paymentDetails,
+                    invoiceNumber: 'INV-' + Date.now(),
+                    invoiceDate: new Date().toISOString()
+                }
+            })
+        } catch (error) {
+            console.error('Booking creation failed:', error)
+            alert('Failed to process booking. Please try again.')
+        }
     }
 
     if (!bookingData) {

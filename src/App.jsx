@@ -33,8 +33,10 @@ import YogaVideos from './pages/YogaVideos'
 function AppContent() {
     const location = useLocation()
 
-    // Hide header and footer for admin and teacher routes
-    const hideLayout = location.pathname.startsWith('/admin') || location.pathname.startsWith('/teacher')
+    // Hide header and footer for admin, teacher, and user dashboard routes
+    const hideLayout = location.pathname.startsWith('/admin') ||
+        location.pathname.startsWith('/teacher') ||
+        location.pathname === '/dashboard'
 
     return (
         <div className="flex flex-col min-h-screen">
@@ -60,6 +62,7 @@ function AppContent() {
                     <Route path="/feedback" element={<Feedback />} />
                     <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
                     <Route path="/teacher/profile" element={<TeacherProfile />} />
+                    <Route path="/teacher/:id" element={<TeacherProfile />} />
                     <Route path="/admin/dashboard" element={<AdminDashboard />} />
                     <Route path="/admin/users" element={<UserManagement />} />
                     <Route path="/admin/teachers" element={<TeacherManagement />} />
