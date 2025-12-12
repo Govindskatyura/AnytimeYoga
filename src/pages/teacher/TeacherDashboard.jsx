@@ -122,6 +122,10 @@ const TeacherDashboard = () => {
                             AY
                         </div>
                         <span className="font-display font-semibold text-lg text-white tracking-wide">Teacher Portal</span>
+                        <Link to="/" className="ml-6 flex items-center space-x-2 text-xs font-medium text-yoga-sage-300 hover:text-white px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 transition-all border border-white/5">
+                            <ChevronDown className="rotate-90" size={12} />
+                            <span>Go Home</span>
+                        </Link>
                     </div>
 
                     <div className="flex items-center space-x-6">

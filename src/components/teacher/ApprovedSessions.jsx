@@ -17,7 +17,7 @@ const ApprovedSessions = ({ sessions, onMarkCompleted }) => {
     return (
         <div className="space-y-4">
             {sessions.map((session) => (
-                <div key={session.id} className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow">
+                <div key={session._id} className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow">
                     <div className="flex justify-between items-start mb-4">
                         <div className="flex-grow">
                             <div className="flex items-center space-x-2 mb-3">
@@ -61,7 +61,7 @@ const ApprovedSessions = ({ sessions, onMarkCompleted }) => {
 
                     <div className="pt-4 border-t border-gray-200">
                         <Button
-                            onClick={() => onMarkCompleted(session.id)}
+                            onClick={() => onMarkCompleted(session._id)}
                             className="w-full justify-center bg-yoga-sage-600 hover:bg-yoga-sage-700"
                         >
                             <CheckCircle size={18} className="mr-2" />

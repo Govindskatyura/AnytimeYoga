@@ -57,10 +57,22 @@ export const api = {
             const users = JSON.parse(localStorage.getItem('users') || '[]')
             const user = users.find(u => u.email === userData.email)
             if (user && user.password === userData.password) {
+                if (user.email === 'admin@anytimeyoga.com') {
+                    return {
+                        _id: user._id,
+                        name: user.name,
+                        email: user.email,
+                        isAdmin: true,
+                        role: 'admin',
+                        token: 'mock_jwt_token_' + Date.now()
+                    }
+                }
+
                 return {
                     _id: user._id,
                     name: user.name,
                     email: user.email,
+                    role: user.role || 'user', // Ensure role exists
                     token: 'mock_jwt_token_' + Date.now()
                 }
             }
@@ -183,6 +195,26 @@ export const api = {
             // and maybe a placeholder or the same image if it was a file object?
             // Since we can't persist the file in localstorage easily without base64 conversion.
             return { message: 'Image uploaded (Mock)', image: null }
+        }
+    },
+
+
+
+    submitInquiry: async (inquiryData) => {
+        try {
+            const response = await fetch(`${API_URL}/inquiries`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(inquiryData),
+            })
+            if (!response.ok) throw new Error('Failed to submit inquiry')
+            return await response.json()
+        } catch (error) {
+            console.warn('Backend unavailable, using Mock Inquiry:', error)
+            // Mock success response
+            return { message: 'Inquiry submitted successfully (Mock)', inquiry: inquiryData }
         }
     },
 

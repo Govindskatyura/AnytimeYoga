@@ -17,7 +17,7 @@ const PendingRequests = ({ requests, onApprove, onReject }) => {
     return (
         <div className="space-y-4">
             {requests.map((request) => (
-                <div key={request.id} className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow">
+                <div key={request._id} className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow">
                     <div className="flex justify-between items-start mb-4">
                         <div className="flex-grow">
                             <div className="flex items-center space-x-2 mb-3">
@@ -58,14 +58,14 @@ const PendingRequests = ({ requests, onApprove, onReject }) => {
 
                     <div className="flex space-x-3 pt-4 border-t border-gray-200">
                         <Button
-                            onClick={() => onApprove(request.id)}
+                            onClick={() => onApprove(request._id)}
                             className="flex-1 bg-green-600 hover:bg-green-700 justify-center"
                         >
                             <CheckCircle size={18} className="mr-2" />
                             Accept
                         </Button>
                         <button
-                            onClick={() => onReject(request.id)}
+                            onClick={() => onReject(request._id)}
                             className="flex-1 px-4 py-2 bg-red-50 text-red-600 border border-red-200 rounded-lg hover:bg-red-100 transition-colors font-medium flex items-center justify-center"
                         >
                             <XCircle size={18} className="mr-2" />

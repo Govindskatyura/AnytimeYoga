@@ -19,7 +19,16 @@ const Login = () => {
 
     useEffect(() => {
         window.scrollTo(0, 0)
-    }, [])
+
+        // Auto-redirect if already logged in
+        if (localStorage.getItem('userAuth')) {
+            navigate('/')
+        } else if (localStorage.getItem('teacherAuth')) {
+            navigate('/teacher/dashboard')
+        } else if (localStorage.getItem('adminAuth')) {
+            navigate('/admin/dashboard')
+        }
+    }, [navigate])
 
     const handleChange = (e) => {
         const { name, value } = e.target
@@ -55,15 +64,18 @@ const Login = () => {
             if (role === 'user') {
                 data = await api.loginUser(formData)
                 localStorage.setItem('userAuth', JSON.stringify(data))
-                navigate('/dashboard')
+                navigate('/')
             } else if (role === 'teacher') {
                 data = await api.loginTeacher(formData)
                 localStorage.setItem('teacherAuth', JSON.stringify(data))
                 localStorage.setItem('teacherEmail', data.email) // Keep for legacy support if needed
                 navigate('/teacher/dashboard')
             } else if (role === 'admin') {
-                // Admin auth not yet implemented on backend, likely hardcoded or future task
-                localStorage.setItem('adminAuth', 'true')
+                data = await api.loginUser(formData)
+                if (data.role !== 'admin' && !data.isAdmin) {
+                    throw new Error('Not authorized as admin')
+                }
+                localStorage.setItem('adminAuth', JSON.stringify(data))
                 navigate('/admin/dashboard')
             }
         } catch (error) {

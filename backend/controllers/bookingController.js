@@ -53,8 +53,13 @@ const getBookings = async (req, res) => {
         let bookings = []
 
         if (req.user) {
-            // User fetching their bookings
-            bookings = await Booking.find({ user: req.user._id }).sort({ createdAt: -1 })
+            // Check if Admin
+            if (req.user.role === 'admin' || req.user.isAdmin) {
+                bookings = await Booking.find({}).sort({ createdAt: -1 })
+            } else {
+                // User fetching their bookings
+                bookings = await Booking.find({ user: req.user._id }).sort({ createdAt: -1 })
+            }
         } else if (req.teacher) {
             // Teacher fetching their bookings
             // We stored teacher ID as string in Booking model 'teacher' field

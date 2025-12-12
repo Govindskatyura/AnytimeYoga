@@ -1,20 +1,60 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Users, GraduationCap, Calendar, DollarSign, TrendingUp, Search, Bell, Settings, Menu, CreditCard, CheckCircle, Clock, X } from 'lucide-react'
+import { Users, GraduationCap, Calendar, DollarSign, TrendingUp, Search, Bell, Settings, Menu, CreditCard, CheckCircle, Clock, X, LogOut, ChevronDown } from 'lucide-react'
+import { api } from '../../services/api'
+import cosmicBg from '../../assets/images/cosmic-bg.png'
 
 const AdminDashboard = () => {
     const navigate = useNavigate()
     const [sidebarOpen, setSidebarOpen] = useState(true)
     const [activeView, setActiveView] = useState('overview')
+    const [stats, setStats] = useState({
+        totalRevenue: 0,
+        totalBookings: 0,
+        activeTeachers: 0,
+        totalUsers: 0
+    })
+    const [recentBookings, setRecentBookings] = useState([])
+    const [isLoading, setIsLoading] = useState(true)
+    const [adminProfile, setAdminProfile] = useState(null)
 
     useEffect(() => {
         window.scrollTo(0, 0)
 
-        const isAuthenticated = localStorage.getItem('adminAuth')
-        if (!isAuthenticated) {
-            navigate('/')
+        const auth = JSON.parse(localStorage.getItem('adminAuth'))
+        if (!auth || (auth.role !== 'admin' && !auth.isAdmin)) {
+            navigate('/login')
             return
         }
+        setAdminProfile(auth)
+
+        const fetchData = async () => {
+            try {
+                // Fetch All Bookings
+                const bookings = await api.getBookings(auth.token)
+
+                // Fetch Teachers (for stats)
+                const teachers = await api.getTeachers()
+
+                // Calculate Stats
+                const revenue = bookings.reduce((acc, curr) => acc + (parseInt(curr.amount) || 0), 0)
+
+                setStats({
+                    totalRevenue: revenue,
+                    totalBookings: bookings.length,
+                    activeTeachers: teachers.length,
+                    totalUsers: 142 // Mock for now or fetch if User API exists
+                })
+
+                setRecentBookings(bookings.slice(0, 5))
+            } catch (error) {
+                console.error('Failed to fetch admin data:', error)
+            } finally {
+                setIsLoading(false)
+            }
+        }
+
+        fetchData()
     }, [navigate])
 
     const handleLogout = () => {
@@ -31,469 +71,240 @@ const AdminDashboard = () => {
         { title: 'Feedback', onClick: () => navigate('/admin/feedback') },
     ]
 
-    // Real yoga booking data
-    const bookingStats = [
-        {
-            icon: '📅',
-            value: '156',
-            label: 'Total Bookings',
-            change: '+12.5%',
-            subtext: 'This month',
-            positive: true,
-            color: 'from-blue-400 to-blue-500'
-        },
-        {
-            icon: '✅',
-            value: '124',
-            label: 'Completed Sessions',
-            change: '+18.2%',
-            subtext: 'Success rate 79%',
-            positive: true,
-            color: 'from-green-400 to-green-500'
-        },
-        {
-            icon: '💰',
-            value: '₹85,400',
-            label: 'Total Revenue',
-            change: '+24.8%',
-            subtext: 'Monthly income',
-            positive: true,
-            color: 'from-purple-400 to-purple-500'
-        }
-    ]
+    const formatCurrency = (amount) => {
+        return new Intl.NumberFormat('en-IN', {
+            style: 'currency',
+            currency: 'INR',
+            maximumFractionDigits: 0
+        }).format(amount)
+    }
 
-    // Recent bookings
-    const recentBookings = [
-        {
-            id: 'BK-1234',
-            user: 'Sarah Jenkins',
-            teacher: 'Priya Sharma',
-            yogaType: 'Vinyasa',
-            date: '2025-12-10',
-            time: '07:00 AM',
-            amount: '₹800',
-            status: 'confirmed',
-            paymentStatus: 'paid'
-        },
-        {
-            id: 'BK-1235',
-            user: 'Michael Brown',
-            teacher: 'Raj Kumar',
-            yogaType: 'Hatha',
-            date: '2025-12-11',
-            time: '08:00 AM',
-            amount: '₹800',
-            status: 'pending',
-            paymentStatus: 'pending'
-        },
-        {
-            id: 'BK-1236',
-            user: 'Emily Davis',
-            teacher: 'Priya Sharma',
-            yogaType: 'Power Yoga',
-            date: '2025-12-12',
-            time: '06:00 PM',
-            amount: '₹1000',
-            status: 'confirmed',
-            paymentStatus: 'paid'
-        },
-        {
-            id: 'BK-1237',
-            user: 'David Wilson',
-            teacher: 'Anita Desai',
-            yogaType: 'Yin Yoga',
-            date: '2025-12-12',
-            time: '09:00 AM',
-            amount: '₹800',
-            status: 'completed',
-            paymentStatus: 'paid'
-        },
-        {
-            id: 'BK-1238',
-            user: 'Anna Lee',
-            teacher: 'Raj Kumar',
-            yogaType: 'Kundalini',
-            date: '2025-12-13',
-            time: '07:30 AM',
-            amount: '₹1200',
-            status: 'confirmed',
-            paymentStatus: 'paid'
-        }
-    ]
-
-    // Recent payments
-    const recentPayments = [
-        { id: 'PAY-5678', user: 'Sarah Jenkins', amount: '₹800', method: 'UPI', date: '2025-12-08', status: 'success' },
-        { id: 'PAY-5679', user: 'Emily Davis', amount: '₹1000', method: 'Card', date: '2025-12-08', status: 'success' },
-        { id: 'PAY-5680', user: 'Michael Brown', amount: '₹800', method: 'Net Banking', date: '2025-12-07', status: 'pending' },
-        { id: 'PAY-5681', user: 'Anna Lee', amount: '₹1200', method: 'UPI', date: '2025-12-07', status: 'success' }
-    ]
-
-    // Activity feed
-    const activities = [
-        { type: 'booking', text: 'New session booked by Sarah Jenkins', time: '10 mins ago', icon: '📅' },
-        { type: 'payment', text: 'Payment of ₹1000 received from Emily Davis', time: '25 mins ago', icon: '💳' },
-        { type: 'user', text: 'New user registered: Michael Brown', time: '1 hour ago', icon: '👤' },
-        { type: 'session', text: 'Session completed by Priya Sharma', time: '2 hours ago', icon: '✅' },
-        { type: 'feedback', text: 'New 5-star review from David Wilson', time: '3 hours ago', icon: '⭐' }
-    ]
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-900" style={{
+                backgroundImage: `url(${cosmicBg})`,
+                backgroundSize: 'cover'
+            }}>
+                <div className="w-16 h-16 border-4 border-yoga-sage-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        )
+    }
 
     return (
-        <div className="flex h-screen bg-gray-50">
-            {/* Left Sidebar - Green */}
-            <aside className={`${sidebarOpen ? 'w-64' : 'w-0'} bg-gradient-to-b from-emerald-500 to-emerald-600 text-white transition-all duration-300 overflow-hidden flex-shrink-0`}>
-                <div className="p-6">
-                    <div className="flex items-center justify-between mb-8">
-                        <h1 className="text-2xl font-bold">AnyTime Yoga</h1>
-                    </div>
+        <div className="min-h-screen font-sans text-gray-100 selection:bg-yoga-sage-500 selection:text-white relative" style={{
+            backgroundImage: `url(${cosmicBg})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundAttachment: 'fixed'
+        }}>
+            {/* Overlay */}
+            <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-[2px] z-0"></div>
 
-                    {/* Menu */}
-                    <nav className="space-y-1">
-                        <div className="text-xs font-semibold text-emerald-200 mb-3 px-3">ADMIN PANEL</div>
-                        {menuItems.map((item, idx) => (
-                            <button
-                                key={idx}
-                                onClick={item.onClick}
-                                className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-colors text-left ${item.active
-                                    ? 'bg-emerald-700 text-white'
-                                    : 'text-emerald-100 hover:bg-emerald-600'
-                                    }`}
-                            >
-                                <span className="text-sm font-medium">{item.title}</span>
-                            </button>
-                        ))}
-
-                        {/* Quick Stats in Sidebar */}
-                        <div className="pt-6 mt-6 border-t border-emerald-400">
-                            <div className="text-xs font-semibold text-emerald-200 mb-3 px-3">QUICK STATS</div>
-                            <div className="px-3 space-y-3">
-                                <div className="flex items-center justify-between text-sm">
-                                    <span className="text-emerald-100">Active Users</span>
-                                    <span className="font-bold">1,284</span>
-                                </div>
-                                <div className="flex items-center justify-between text-sm">
-                                    <span className="text-emerald-100">Teachers</span>
-                                    <span className="font-bold">24</span>
-                                </div>
-                                <div className="flex items-center justify-between text-sm">
-                                    <span className="text-emerald-100">Today's Sessions</span>
-                                    <span className="font-bold">8</span>
-                                </div>
+            <div className="relative z-10 flex h-screen overflow-hidden">
+                {/* Sidebar */}
+                <aside className={`${sidebarOpen ? 'w-72' : 'w-0'} bg-gray-900/80 backdrop-blur-xl border-r border-white/10 transition-all duration-300 overflow-hidden flex-shrink-0 flex flex-col`}>
+                    <div className="p-6">
+                        <div className="flex items-center space-x-3 mb-10">
+                            <div className="w-10 h-10 bg-gradient-to-br from-yoga-sage-400 to-yoga-sage-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-yoga-sage-500/20">
+                                AY
                             </div>
+                            <span className="font-display font-semibold text-lg text-white tracking-wide">AnyTime Yoga</span>
                         </div>
-                    </nav>
-                </div>
-            </aside>
 
-            {/* Main Content */}
-            <div className="flex-1 flex flex-col overflow-hidden">
-                {/* Top Header */}
-                <header className="bg-white border-b border-gray-200 px-6 py-4">
-                    <div className="flex items-center justify-between">
+                        {/* Menu */}
+                        <nav className="space-y-2 flex-grow">
+                            <div className="text-xs font-semibold text-gray-500 mb-4 px-3 tracking-wider">ADMIN PLATFORM</div>
+                            {menuItems.map((item, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={item.onClick}
+                                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300 text-left group ${item.active
+                                        ? 'bg-gradient-to-r from-yoga-sage-600/20 to-yoga-sage-400/10 border border-yoga-sage-500/30 text-white'
+                                        : 'text-gray-400 hover:text-white hover:bg-white/5 border border-transparent'
+                                        }`}
+                                >
+                                    {/* Simplified Icons matching original layout logic or placeholders */}
+                                    <span className={`text-sm font-medium ${item.active ? 'text-yoga-sage-300' : ''}`}>{item.title}</span>
+                                    {item.active && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-yoga-sage-400 shadow-[0_0_8px_rgba(132,204,22,0.6)]"></div>}
+                                </button>
+                            ))}
+                        </nav>
+
+                        <div className="pt-6 mt-auto">
+                            <button
+                                onClick={handleLogout}
+                                className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-colors border border-transparent hover:border-red-500/20"
+                            >
+                                <LogOut size={18} />
+                                <span className="font-medium">Logout Admin</span>
+                            </button>
+                        </div>
+                    </div>
+                </aside>
+
+                {/* Main Content */}
+                <div className="flex-1 flex flex-col overflow-hidden relative">
+                    {/* Top Header */}
+                    <header className="bg-gray-900/50 backdrop-blur-xl border-b border-white/10 px-6 py-4 flex items-center justify-between">
                         <div className="flex items-center space-x-4">
                             <button
                                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                                className="p-2 hover:bg-gray-100 rounded-lg"
+                                className="p-2 hover:bg-white/10 rounded-lg text-gray-300 transition-colors"
                             >
                                 <Menu size={20} />
                             </button>
-                            <div className="relative">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                                <input
-                                    type="text"
-                                    placeholder="Search bookings, users..."
-                                    className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 w-80"
-                                />
-                            </div>
+                            <h2 className="text-xl font-display font-semibold text-white">Dashboard Overview</h2>
                         </div>
-                        <div className="flex items-center space-x-4">
-                            <button className="p-2 hover:bg-gray-100 rounded-lg relative">
-                                <Bell size={20} />
-                                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                            </button>
-                            <button className="p-2 hover:bg-gray-100 rounded-lg">
-                                <Settings size={20} />
-                            </button>
-                            <div className="flex items-center space-x-3 pl-4 border-l border-gray-300">
-                                <div className="text-right">
-                                    <p className="text-sm font-semibold text-gray-900">Admin User</p>
-                                    <p className="text-xs text-gray-500">Super Admin</p>
+
+                        <div className="flex items-center space-x-6">
+                            <div className="hidden md:flex items-center space-x-4">
+                                <span className="text-sm text-gray-400">{new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long' })}</span>
+                            </div>
+                            <div className="h-8 w-px bg-white/10"></div>
+                            <div className="flex items-center space-x-3">
+                                <div className="text-right hidden md:block">
+                                    <p className="text-sm font-semibold text-white">{adminProfile?.name}</p>
+                                    <p className="text-xs text-yoga-sage-400">Super Admin</p>
                                 </div>
-                                <img
-                                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop"
-                                    alt="Admin"
-                                    className="w-10 h-10 rounded-full object-cover"
-                                />
+                                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-orange-400 to-red-500 p-0.5">
+                                    <div className="w-full h-full rounded-full bg-gray-900 flex items-center justify-center">
+                                        <span className="font-bold text-white">A</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </header>
+                    </header>
 
-                {/* Main Dashboard Content */}
-                <main className="flex-1 overflow-y-auto p-6">
-                    {/* Dashboard Title */}
-                    <div className="mb-6">
-                        <div className="flex items-center space-x-2 text-gray-400 mb-2">
-                            <span className="text-emerald-600">🧘‍♀️</span>
-                        </div>
-                        <h2 className="text-2xl font-bold text-gray-900">Yoga Booking Analytics</h2>
-                        <p className="text-gray-500">Monitor bookings, payments, and platform performance in real-time.</p>
-                    </div>
-
-                    {/* View Tabs */}
-                    <div className="flex space-x-2 mb-6">
-                        <button
-                            onClick={() => setActiveView('overview')}
-                            className={`px-4 py-2 rounded-lg font-medium ${activeView === 'overview'
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-white text-gray-600 hover:bg-gray-100'
-                                }`}
-                        >
-                            Overview
-                        </button>
-                        <button
-                            onClick={() => setActiveView('bookings')}
-                            className={`px-4 py-2 rounded-lg font-medium ${activeView === 'bookings'
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-white text-gray-600 hover:bg-gray-100'
-                                }`}
-                        >
-                            Bookings
-                        </button>
-                    </div>
-
-                    {/* Booking Performance Cards */}
-                    <div className="bg-white rounded-xl p-6 mb-6 border border-gray-200">
-                        <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-lg font-bold text-gray-900">Booking Performance</h3>
-                            <button className="text-sm text-emerald-600 hover:text-emerald-700 font-medium">
-                                View Detailed Report →
-                            </button>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                            {bookingStats.map((card, idx) => (
-                                <div key={idx} className="flex items-start space-x-4">
-                                    <div className={`w-14 h-14 rounded-full bg-gradient-to-br ${card.color} flex items-center justify-center text-2xl flex-shrink-0`}>
-                                        {card.icon}
-                                    </div>
-                                    <div>
-                                        <div className="flex items-baseline space-x-2 mb-1">
-                                            <h4 className="text-2xl font-bold text-gray-900">{card.value}</h4>
-                                            <span className="text-xs font-semibold text-green-600">
-                                                {card.change}
-                                            </span>
+                    {/* Dashboard Content */}
+                    <main className="flex-1 overflow-y-auto p-6 md:p-8">
+                        {/* Stats Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                            {[
+                                {
+                                    label: 'Total Revenue',
+                                    value: formatCurrency(stats.totalRevenue),
+                                    icon: DollarSign,
+                                    color: 'text-emerald-400',
+                                    bg: 'bg-emerald-400/10',
+                                    border: 'border-emerald-400/20'
+                                },
+                                {
+                                    label: 'Total Bookings',
+                                    value: stats.totalBookings,
+                                    icon: Calendar,
+                                    color: 'text-blue-400',
+                                    bg: 'bg-blue-400/10',
+                                    border: 'border-blue-400/20'
+                                },
+                                {
+                                    label: 'Active Teachers',
+                                    value: stats.activeTeachers,
+                                    icon: GraduationCap,
+                                    color: 'text-yoga-lavender-400',
+                                    bg: 'bg-yoga-lavender-400/10',
+                                    border: 'border-yoga-lavender-400/20'
+                                },
+                                {
+                                    label: 'Registered Users',
+                                    value: stats.totalUsers,
+                                    icon: Users,
+                                    color: 'text-orange-400',
+                                    bg: 'bg-orange-400/10',
+                                    border: 'border-orange-400/20'
+                                }
+                            ].map((stat, idx) => (
+                                <div key={idx} className={`bg-white/5 backdrop-blur-xl border ${stat.border} rounded-2xl p-6 hover:translate-y-[-2px] transition-all duration-300 shadow-lg`}>
+                                    <div className="flex items-center justify-between mb-4">
+                                        <div className={`p-3 rounded-xl ${stat.bg}`}>
+                                            <stat.icon className={stat.color} size={24} />
                                         </div>
-                                        <p className="text-sm text-gray-600">{card.label}</p>
-                                        <p className="text-xs text-gray-400">{card.subtext}</p>
+                                        <span className="text-xs font-semibold px-2 py-1 rounded-full bg-white/5 text-gray-300">Live</span>
                                     </div>
+                                    <h3 className="text-3xl font-display font-bold text-white mb-1">{stat.value}</h3>
+                                    <p className="text-sm text-gray-400">{stat.label}</p>
                                 </div>
                             ))}
                         </div>
 
-                        <button className="w-full py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">
-                            Generate Monthly Report
-                        </button>
-                    </div>
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            {/* Recent Bookings Table */}
+                            <div className="lg:col-span-2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-xl">
+                                <div className="flex items-center justify-between mb-6">
+                                    <h3 className="text-xl font-bold text-white">Recent Bookings</h3>
+                                    <button onClick={() => navigate('/admin/schedules')} className="text-sm text-yoga-sage-400 hover:text-yoga-sage-300 transition-colors">
+                                        View All
+                                    </button>
+                                </div>
 
-                    {/* Recent Bookings & Revenue Chart */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                        {/* Recent Bookings Table */}
-                        <div className="bg-white rounded-xl p-6 border border-gray-200">
-                            <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-lg font-bold text-gray-900">Recent Bookings</h3>
-                                <button
-                                    onClick={() => navigate('/admin/schedules')}
-                                    className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
-                                >
-                                    View All →
+                                <div className="space-y-4">
+                                    {recentBookings.length === 0 ? (
+                                        <div className="text-center py-10 text-gray-500">No bookings found</div>
+                                    ) : (
+                                        recentBookings.map((booking) => (
+                                            <div key={booking._id || booking.id} className="flex items-center justify-between p-4 bg-white/5 rounded-2xl hover:bg-white/10 transition-colors border border-white/5 group">
+                                                <div className="flex items-center space-x-4">
+                                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-yoga-sage-500/20 to-blue-500/20 flex items-center justify-center text-white border border-white/10">
+                                                        <Calendar size={18} />
+                                                    </div>
+                                                    <div>
+                                                        <div className="flex items-center space-x-2">
+                                                            <h4 className="font-semibold text-white">{booking.userName}</h4>
+                                                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${booking.status === 'Confirmed' ? 'bg-green-500/20 text-green-300 border border-green-500/20' :
+                                                                    booking.status === 'Cancelled' ? 'bg-red-500/20 text-red-300 border border-red-500/20' :
+                                                                        booking.status === 'Completed' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/20' :
+                                                                            'bg-yellow-500/20 text-yellow-300 border border-yellow-500/20'
+                                                                }`}>
+                                                                {booking.status}
+                                                            </span>
+                                                        </div>
+                                                        <div className="text-xs text-gray-400 mt-0.5 flex items-center space-x-2">
+                                                            <span>{booking.teacherName}</span>
+                                                            <span className="w-1 h-1 rounded-full bg-gray-600"></span>
+                                                            <span>{booking.yogaType}</span>
+                                                            <span className="w-1 h-1 rounded-full bg-gray-600"></span>
+                                                            <span>{new Date(booking.date).toLocaleDateString()}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className="font-bold text-white font-display">₹{booking.amount}</p>
+                                                    <p className="text-xs text-gray-500">{booking.time}</p>
+                                                </div>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Revenue Card (Placeholder Visual) */}
+                            <div className="bg-gradient-to-br from-yoga-sage-900/60 to-gray-900/60 backdrop-blur-xl border border-yoga-sage-500/20 rounded-3xl p-6 shadow-xl flex flex-col justify-between relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-64 h-64 bg-yoga-sage-500/20 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
+
+                                <div>
+                                    <div className="flex items-center space-x-2 text-yoga-sage-300 mb-2">
+                                        <TrendingUp size={18} />
+                                        <span className="text-sm font-medium">Monthly Growth</span>
+                                    </div>
+                                    <h3 className="text-4xl font-display font-bold text-white mb-1">+24.5%</h3>
+                                    <p className="text-sm text-gray-400">Revenue increase compared to last month</p>
+                                </div>
+
+                                <div className="mt-8 relative h-32">
+                                    {/* Simple CSS Bar Chart Visualization */}
+                                    <div className="absolute inset-0 flex items-end justify-between px-2">
+                                        {[40, 65, 45, 80, 55, 90, 75].map((h, i) => (
+                                            <div key={i} className="w-8 bg-gradient-to-t from-yoga-sage-500 to-yoga-sage-400/50 rounded-t-lg transition-all duration-300 hover:opacity-100 opacity-80" style={{ height: `${h}%` }}></div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <button onClick={() => navigate('/admin/payments')} className="mt-6 w-full py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl font-medium border border-white/10 transition-colors">
+                                    View Payment Report
                                 </button>
                             </div>
-
-                            <div className="space-y-3">
-                                {recentBookings.slice(0, 5).map((booking) => (
-                                    <div key={booking.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                                        <div className="flex-1">
-                                            <div className="flex items-center space-x-2 mb-1">
-                                                <span className="font-semibold text-gray-900 text-sm">{booking.user}</span>
-                                                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${booking.status === 'confirmed' ? 'bg-green-100 text-green-700' :
-                                                    booking.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                                                        'bg-blue-100 text-blue-700'
-                                                    }`}>
-                                                    {booking.status}
-                                                </span>
-                                            </div>
-                                            <p className="text-xs text-gray-500">{booking.yogaType} • {booking.date} @ {booking.time}</p>
-                                            <p className="text-xs text-gray-400">Teacher: {booking.teacher}</p>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className="font-bold text-emerald-600">{booking.amount}</p>
-                                            <p className={`text-xs ${booking.paymentStatus === 'paid' ? 'text-green-600' : 'text-orange-600'}`}>
-                                                {booking.paymentStatus === 'paid' ? '✓ Paid' : '⏳ Pending'}
-                                            </p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
                         </div>
-
-                        {/* Revenue Trend */}
-                        <div className="bg-white rounded-xl p-6 border border-gray-200">
-                            <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-lg font-bold text-gray-900">Revenue Trend</h3>
-                                <button className="text-gray-400 hover:text-gray-600">⋯</button>
-                            </div>
-
-                            <p className="text-xs text-gray-400 mb-4">MONTHLY REVENUE GROWTH</p>
-
-                            <div className="mb-4">
-                                <div className="flex items-baseline space-x-2 mb-2">
-                                    <span className="text-4xl font-bold text-gray-900">₹85.4k</span>
-                                    <span className="text-sm text-green-600 font-semibold">+24.8%</span>
-                                </div>
-                            </div>
-
-                            {/* Revenue Chart */}
-                            <div className="relative h-48 mb-4">
-                                <svg className="w-full h-full" viewBox="0 0 400 150" preserveAspectRatio="none">
-                                    <defs>
-                                        <linearGradient id="revenueGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                                            <stop offset="0%" style={{ stopColor: '#8b5cf6', stopOpacity: 0.3 }} />
-                                            <stop offset="100%" style={{ stopColor: '#8b5cf6', stopOpacity: 0 }} />
-                                        </linearGradient>
-                                    </defs>
-                                    <path
-                                        d="M 0,110 Q 60,90 100,95 T 200,80 T 300,70 T 400,50 V 150 H 0 Z"
-                                        fill="url(#revenueGrad)"
-                                    />
-                                    <path
-                                        d="M 0,110 Q 60,90 100,95 T 200,80 T 300,70 T 400,50"
-                                        fill="none"
-                                        stroke="#8b5cf6"
-                                        strokeWidth="3"
-                                    />
-                                </svg>
-                                <div className="flex justify-between mt-2 text-xs text-gray-500">
-                                    {['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((month) => (
-                                        <span key={month}>{month}</span>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Revenue Breakdown */}
-                            <div>
-                                <p className="text-xs text-gray-400 mb-2">REVENUE SOURCES</p>
-                                <div className="space-y-2">
-                                    <div className="flex items-center justify-between text-sm">
-                                        <span className="text-gray-600">Session Bookings</span>
-                                        <span className="font-semibold text-gray-900">₹64,200 (75%)</span>
-                                    </div>
-                                    <div className="w-full h-2 bg-gray-100 rounded-full">
-                                        <div className="h-full w-3/4 bg-purple-600 rounded-full"></div>
-                                    </div>
-                                    <div className="flex items-center justify-between text-sm">
-                                        <span className="text-gray-600">Free Trial Conversions</span>
-                                        <span className="font-semibold text-gray-900">₹21,200 (25%)</span>
-                                    </div>
-                                    <div className="w-full h-2 bg-gray-100 rounded-full">
-                                        <div className="h-full w-1/4 bg-blue-600 rounded-full"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Recent Payments & Activity Feed */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                        {/* Recent Payments */}
-                        <div className="bg-white rounded-xl p-6 border border-gray-200">
-                            <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-lg font-bold text-gray-900">Recent Payments</h3>
-                                <button
-                                    onClick={() => navigate('/admin/payments')}
-                                    className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
-                                >
-                                    View All →
-                                </button>
-                            </div>
-
-                            <div className="space-y-3">
-                                {recentPayments.map((payment) => (
-                                    <div key={payment.id} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
-                                        <div className="flex items-center space-x-3">
-                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${payment.status === 'success' ? 'bg-green-100' : 'bg-orange-100'
-                                                }`}>
-                                                <CreditCard size={18} className={payment.status === 'success' ? 'text-green-600' : 'text-orange-600'} />
-                                            </div>
-                                            <div>
-                                                <p className="font-semibold text-sm text-gray-900">{payment.user}</p>
-                                                <p className="text-xs text-gray-500">{payment.method} • {payment.date}</p>
-                                            </div>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className="font-bold text-gray-900">{payment.amount}</p>
-                                            <span className={`text-xs ${payment.status === 'success' ? 'text-green-600' : 'text-orange-600'}`}>
-                                                {payment.status === 'success' ? '✓ Success' : '⏳ Pending'}
-                                            </span>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Activity Feed */}
-                        <div className="bg-white rounded-xl p-6 border border-gray-200">
-                            <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-lg font-bold text-gray-900">Recent Activity</h3>
-                            </div>
-
-                            <div className="space-y-4">
-                                {activities.map((activity, idx) => (
-                                    <div key={idx} className="flex items-start space-x-3">
-                                        <div className="text-2xl">{activity.icon}</div>
-                                        <div className="flex-1">
-                                            <p className="text-sm text-gray-900">{activity.text}</p>
-                                            <p className="text-xs text-gray-400">{activity.time}</p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <button className="mt-6 w-full py-2 bg-gray-800 text-white rounded-lg text-sm font-medium hover:bg-gray-900 transition-colors">
-                                View All Activities
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Bottom Stats */}
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                        {[
-                            { value: '1,284', label: 'Total Users', trend: '+142 this month', icon: Users, color: 'text-blue-600' },
-                            { value: '24', label: 'Active Teachers', trend: '+3 this month', icon: GraduationCap, color: 'text-green-600' },
-                            { value: '156', label: 'Active Bookings', trend: '89% completion', icon: Calendar, color: 'text-orange-600' },
-                            { value: '₹85.4k', label: 'Monthly Revenue', trend: '+24.8% growth', icon: DollarSign, color: 'text-purple-600' }
-                        ].map((stat, idx) => (
-                            <div key={idx} className="bg-white rounded-xl p-6 border border-gray-200">
-                                <div className="flex items-center justify-between mb-3">
-                                    <stat.icon className={stat.color} size={24} />
-                                </div>
-                                <h4 className="text-2xl font-bold text-gray-900 mb-1">{stat.value}</h4>
-                                <p className="text-sm text-gray-600 mb-1">{stat.label}</p>
-                                <p className="text-xs text-gray-400">{stat.trend}</p>
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Logout Button */}
-                    <div className="mt-6 flex justify-end">
-                        <button
-                            onClick={handleLogout}
-                            className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
-                        >
-                            Logout
-                        </button>
-                    </div>
-                </main>
+                    </main>
+                </div>
             </div>
         </div>
     )

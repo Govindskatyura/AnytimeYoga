@@ -1,31 +1,37 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Menu, ChevronLeft, ChevronRight } from 'lucide-react'
-import AdminSidebar from '../../components/admin/AdminSidebar'
+import { Menu, ChevronLeft, ChevronRight, Search, Filter, Calendar, Clock, User, CheckCircle, XCircle } from 'lucide-react'
+import { api } from '../../services/api'
+import cosmicBg from '../../assets/images/cosmic-bg.png'
 
 const AllSchedules = () => {
     const navigate = useNavigate()
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const [currentDate, setCurrentDate] = useState(new Date())
     const [sessions, setSessions] = useState([])
+    const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
         window.scrollTo(0, 0)
 
-        // Check auth
-        const isAuthenticated = localStorage.getItem('adminAuth')
-        if (!isAuthenticated) {
-            navigate('/admin/login')
+        const auth = JSON.parse(localStorage.getItem('adminAuth'))
+        if (!auth || (auth.role !== 'admin' && !auth.isAdmin)) {
+            navigate('/login')
             return
         }
 
-        // Mock sessions data
-        setSessions([
-            { id: 1, date: '2025-12-05', teacher: 'Emma Wilson', user: 'Sarah Jenkins', type: 'Vinyasa', time: '07:00 AM', status: 'approved' },
-            { id: 2, date: '2025-12-05', teacher: 'David Lee', user: 'Michael Brown', type: 'Power Yoga', time: '08:00 AM', status: 'pending' },
-            { id: 3, date: '2025-12-08', teacher: 'Emma Wilson', user: 'Emily Davis', type: 'Yin', time: '06:00 PM', status: 'approved' },
-            { id: 4, date: '2025-12-10', teacher: 'David Lee', user: 'John Smith', type: 'Hatha', time: '07:00 AM', status: 'completed' }
-        ])
+        const fetchSessions = async () => {
+            try {
+                const data = await api.getBookings(auth.token)
+                setSessions(data)
+            } catch (error) {
+                console.error('Failed to fetch schedules:', error)
+            } finally {
+                setIsLoading(false)
+            }
+        }
+
+        fetchSessions()
     }, [navigate])
 
     const getDaysInMonth = () => {
@@ -48,58 +54,88 @@ const AllSchedules = () => {
 
     const getSessionsForDate = (day) => {
         if (!day) return []
-        const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
-        return sessions.filter(s => s.date === dateStr)
+        // Compare date strings properly. Date object in DB might be ISO.
+        // Simplified comparison:
+        const targetDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day)
+        return sessions.filter(s => {
+            const sDate = new Date(s.date)
+            return sDate.getDate() === day &&
+                sDate.getMonth() === currentDate.getMonth() &&
+                sDate.getFullYear() === currentDate.getFullYear()
+        })
     }
 
     const getStatusColor = (status) => {
-        const colors = {
-            pending: 'bg-orange-500',
-            approved: 'bg-green-500',
-            completed: 'bg-gray-500'
+        switch (status?.toLowerCase()) {
+            case 'confirmed': return 'bg-green-500/20 text-green-300 border-green-500/20'
+            case 'pending': return 'bg-orange-500/20 text-orange-300 border-orange-500/20'
+            case 'completed': return 'bg-blue-500/20 text-blue-300 border-blue-500/20'
+            case 'cancelled': return 'bg-red-500/20 text-red-300 border-red-500/20'
+            default: return 'bg-gray-500/20 text-gray-300 border-gray-500/20'
         }
-        return colors[status] || 'bg-blue-500'
+    }
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-900" style={{
+                backgroundImage: `url(${cosmicBg})`,
+                backgroundSize: 'cover'
+            }}>
+                <div className="w-16 h-16 border-4 border-yoga-sage-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        )
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <AdminSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        <div className="min-h-screen font-sans text-gray-100 selection:bg-yoga-sage-500 selection:text-white relative" style={{
+            backgroundImage: `url(${cosmicBg})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundAttachment: 'fixed'
+        }}>
+            {/* Overlay */}
+            <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-[2px] z-0"></div>
 
-            <div className="lg:ml-64 min-h-screen">
-                {/* Top Bar */}
-                <div className="bg-white border-b border-gray-200 sticky top-0 z-30">
-                    <div className="flex items-center justify-between p-4">
-                        <div className="flex items-center space-x-4">
-                            <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 hover:bg-gray-100 rounded-lg">
-                                <Menu size={24} />
-                            </button>
-                            <div>
-                                <h1 className="text-2xl font-bold text-gray-900">All Schedules</h1>
-                                <p className="text-sm text-gray-600">{sessions.length} total sessions</p>
-                            </div>
-                        </div>
+            {/* Sidebar (Mobile Overlay / Desktop Stub for consistency if needed, but here simplified as back button + full width or reusing AdminSidebar if refactored. 
+               For now, I will use a simple top nav with Back to Dashboard to avoid code duplication of the sidebar logic or creating a layout file in this short task.)
+            */}
+
+            <div className="relative z-10 min-h-screen flex flex-col">
+                {/* Navbar */}
+                <header className="bg-gray-900/50 backdrop-blur-xl border-b border-white/10 sticky top-0 z-30 px-6 py-4 flex justify-between items-center">
+                    <div className="flex items-center space-x-4">
+                        <button onClick={() => navigate('/admin/dashboard')} className="p-2 hover:bg-white/10 rounded-lg text-gray-300 transition-colors">
+                            <ChevronLeft size={24} />
+                        </button>
+                        <h1 className="text-2xl font-display font-bold text-white">All Schedules</h1>
                     </div>
-                </div>
+                </header>
 
-                {/* Content */}
-                <div className="p-6">
-                    {/* Calendar */}
-                    <div className="bg-white rounded-xl border border-gray-200 p-6">
+                <div className="p-6 md:p-10 flex-1">
+                    {/* Calendar Container */}
+                    <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 md:p-8 shadow-2xl">
                         {/* Month Navigation */}
-                        <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-xl font-bold text-gray-900">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+                            <h2 className="text-2xl font-display font-bold text-white flex items-center">
+                                <Calendar className="mr-3 text-yoga-sage-400" />
                                 {currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                             </h2>
-                            <div className="flex space-x-2">
+                            <div className="flex items-center space-x-2 bg-black/20 p-1 rounded-xl border border-white/5">
                                 <button
                                     onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1))}
-                                    className="p-2 hover:bg-gray-100 rounded-lg"
+                                    className="p-2 hover:bg-white/10 rounded-lg text-gray-300 hover:text-white transition-colors"
                                 >
                                     <ChevronLeft size={20} />
                                 </button>
                                 <button
+                                    onClick={() => setCurrentDate(new Date())}
+                                    className="px-4 py-2 text-sm font-medium text-yoga-sage-300 hover:text-white"
+                                >
+                                    Today
+                                </button>
+                                <button
                                     onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1))}
-                                    className="p-2 hover:bg-gray-100 rounded-lg"
+                                    className="p-2 hover:bg-white/10 rounded-lg text-gray-300 hover:text-white transition-colors"
                                 >
                                     <ChevronRight size={20} />
                                 </button>
@@ -107,9 +143,9 @@ const AllSchedules = () => {
                         </div>
 
                         {/* Calendar Grid */}
-                        <div className="grid grid-cols-7 gap-2">
+                        <div className="grid grid-cols-7 gap-2 md:gap-4 mb-8">
                             {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-                                <div key={day} className="text-center font-bold text-gray-700 py-2">
+                                <div key={day} className="text-center font-bold text-gray-400 uppercase text-xs tracking-wider py-2">
                                     {day}
                                 </div>
                             ))}
@@ -119,20 +155,31 @@ const AllSchedules = () => {
                                 return (
                                     <div
                                         key={index}
-                                        className={`min-h-[100px] border border-gray-200 rounded-lg p-2 ${day ? 'bg-white hover:bg-gray-50' : 'bg-gray-50'
+                                        className={`min-h-[120px] border border-white/5 rounded-2xl p-3 transition-colors ${day ? 'bg-white/5 hover:bg-white/10' : 'bg-transparent border-transparent'
                                             }`}
                                     >
                                         {day && (
                                             <>
-                                                <div className="font-medium text-gray-900 mb-1">{day}</div>
-                                                <div className="space-y-1">
+                                                <div className={`font-medium mb-2 ${day === new Date().getDate() &&
+                                                        currentDate.getMonth() === new Date().getMonth() &&
+                                                        currentDate.getFullYear() === new Date().getFullYear()
+                                                        ? 'w-7 h-7 bg-yoga-sage-500 rounded-full flex items-center justify-center text-white shadow-lg'
+                                                        : 'text-gray-300'
+                                                    }`}>
+                                                    {day}
+                                                </div>
+                                                <div className="space-y-1.5 overflow-y-auto max-h-[80px] custom-scrollbar">
                                                     {daySessions.map((session) => (
                                                         <div
-                                                            key={session.id}
-                                                            className="text-xs p-1 rounded bg-yoga-sage-100 text-yoga-sage-700"
+                                                            key={session._id || session.id}
+                                                            className={`text-[10px] p-1.5 rounded-lg border ${getStatusColor(session.status)} truncate cursor-pointer hover:opacity-80 transition-opacity`}
+                                                            title={`${session.time} - ${session.yogaType} by ${session.teacherName}`}
                                                         >
-                                                            <div className={`w-2 h-2 rounded-full ${getStatusColor(session.status)} inline-block mr-1`}></div>
-                                                            {session.time}
+                                                            <div className="flex items-center space-x-1">
+                                                                <Clock size={10} />
+                                                                <span>{session.time}</span>
+                                                            </div>
+                                                            <div className="truncate font-semibold">{session.yogaType}</div>
                                                         </div>
                                                     ))}
                                                 </div>
@@ -142,21 +189,20 @@ const AllSchedules = () => {
                                 )
                             })}
                         </div>
-                    </div>
 
-                    {/* Legend */}
-                    <div className="mt-4 flex items-center space-x-6 text-sm">
-                        <div className="flex items-center space-x-2">
-                            <div className="w-3 h-3 rounded-full bg-orange-500"></div>
-                            <span className="text-gray-600">Pending</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                            <span className="text-gray-600">Approved</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            <div className="w-3 h-3 rounded-full bg-gray-500"></div>
-                            <span className="text-gray-600">Completed</span>
+                        {/* Legend */}
+                        <div className="flex flex-wrap gap-4 items-center justify-center border-t border-white/10 pt-6">
+                            {[
+                                { label: 'Pending', color: 'bg-orange-500' },
+                                { label: 'Confirmed', color: 'bg-green-500' },
+                                { label: 'Completed', color: 'bg-blue-500' },
+                                { label: 'Cancelled', color: 'bg-red-500' }
+                            ].map(item => (
+                                <div key={item.label} className="flex items-center space-x-2">
+                                    <div className={`w-3 h-3 rounded-full ${item.color} shadow-lg shadow-${item.color}/50`}></div>
+                                    <span className="text-sm text-gray-400">{item.label}</span>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>

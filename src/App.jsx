@@ -36,7 +36,8 @@ function AppContent() {
     // Hide header and footer for admin, teacher, and user dashboard routes
     const hideLayout = location.pathname.startsWith('/admin') ||
         location.pathname.startsWith('/teacher') ||
-        location.pathname === '/dashboard'
+        location.pathname === '/dashboard' ||
+        location.pathname === '/free-trial'
 
     return (
         <div className="flex flex-col min-h-screen">
