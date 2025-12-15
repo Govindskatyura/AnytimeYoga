@@ -46,6 +46,22 @@ Important ones include:
 - Avoid storing JWTs in `localStorage` in production; prefer HttpOnly Secure cookies to reduce XSS risk.
 - Seeder creates demo admin/user/teacher accounts in development only. Change any default demo passwords before publishing.
 
+## Development vs Production
+
+- **Development:**
+	- Use `.env` copied from `.env.example`; demo credentials and seed scripts are fine for local testing.
+	- Seeding is enabled for non-production to create demo users/teachers; run seed scripts manually if needed (e.g., `node backend/seed/seedTeachers.js`).
+	- CORS can be permissive locally; using `VITE_API_URL` pointing to a local backend is normal.
+	- It's acceptable to use Ethereal/simulated SMTP for tests and `localStorage` for demo auth flows.
+
+- **Production:**
+	- Set `NODE_ENV=production` and provide strong secrets: `JWT_SECRET`, real `MONGO_URI`, and SMTP credentials (`SMTP_*`).
+	- **Do not** run seeders in production. We guard this with `NODE_ENV !== 'production'` but double-check before deployment.
+	- Restrict `CORS_ORIGIN` to the exact allowed origins (comma-separated) and run behind HTTPS (reverse proxy or load balancer).
+	- Use Secure, HttpOnly cookies for authentication tokens instead of storing sensitive tokens in `localStorage`.
+	- Configure rate limits, monitoring, logging/rotation, backups, secret rotation, and automated vulnerability scanning in CI.
+	- Consider additional hardening: `express-mongo-sanitize`, `xss-clean`, strict CSP, WAF, and a secrets manager (e.g. AWS Secrets Manager, Vault).
+
 ## CI / Audits
 
 - Run `npm audit` regularly and add an `npm audit` job to CI to block high-severity issues.
