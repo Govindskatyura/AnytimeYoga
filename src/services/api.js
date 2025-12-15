@@ -56,6 +56,19 @@ export const api = {
             // Mock Login
             const users = JSON.parse(localStorage.getItem('users') || '[]')
             const user = users.find(u => u.email === userData.email)
+
+            // Hardcoded fallback for Admin if not in localStorage
+            if (userData.email === 'admin@anytimeyoga.com' && userData.password === 'admin123') {
+                return {
+                    _id: 'admin_demo_123',
+                    name: 'Admin User',
+                    email: 'admin@anytimeyoga.com',
+                    isAdmin: true,
+                    role: 'admin',
+                    token: 'mock_jwt_token_admin_' + Date.now()
+                }
+            }
+
             if (user && user.password === userData.password) {
                 if (user.email === 'admin@anytimeyoga.com') {
                     return {
@@ -76,6 +89,18 @@ export const api = {
                     token: 'mock_jwt_token_' + Date.now()
                 }
             }
+
+            // Hardcoded fallback for Demo User if not in localStorage
+            if (userData.email === 'user@example.com' && userData.password === 'user123') {
+                return {
+                    _id: 'user_demo_123',
+                    name: 'Demo User',
+                    email: 'user@example.com',
+                    role: 'user',
+                    token: 'mock_jwt_token_demo_' + Date.now()
+                }
+            }
+
             throw new Error('Invalid email or password')
         }
     },

@@ -8,7 +8,7 @@ import { api } from '../services/api'
 
 const Login = () => {
     const navigate = useNavigate()
-    const [role, setRole] = useState('user')
+    const [role, setRole] = useState(null)
     const [formData, setFormData] = useState({
         email: '',
         password: ''
@@ -112,7 +112,11 @@ const Login = () => {
         }
     }
 
-    const config = roleConfig[role]
+    const config = role ? roleConfig[role] : {
+        color: 'from-gray-400 to-gray-500',
+        icon: '🔒',
+        demo: { email: '', password: '' }
+    }
 
     return (
         <div className="min-h-screen relative">
@@ -169,75 +173,85 @@ const Login = () => {
                                     {config.icon}
                                 </div>
                                 <h1 className="text-3xl font-display font-bold text-gray-900 mb-2">
-                                    {config.title}
+                                    {role ? roleConfig[role].title : 'Welcome Back'}
                                 </h1>
-                                <p className="text-gray-600">{config.subtitle}</p>
+                                <p className="text-gray-600">
+                                    {role ? roleConfig[role].subtitle : 'Please select your role to login'}
+                                </p>
                             </div>
 
-                            {errors.api && (
-                                <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg text-center">
-                                    {errors.api}
+                            {!role ? (
+                                <div className="text-center py-8 text-gray-500">
+                                    Select User, Teacher, or Admin to continue
                                 </div>
-                            )}
-
-                            <form onSubmit={handleSubmit} className="space-y-6">
-                                {/* Email */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                                    <div className="relative">
-                                        <input
-                                            type="email"
-                                            name="email"
-                                            placeholder={config.demo.email}
-                                            value={formData.email}
-                                            onChange={handleChange}
-                                            className={`w-full pl-10 pr-4 py-3 rounded-xl border ${errors.email ? 'border-red-300 bg-red-50' : 'border-gray-200'} focus:outline-none focus:ring-2 focus:ring-yoga-sage-400`}
-                                        />
-                                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                                    </div>
-                                    {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
-                                </div>
-
-                                {/* Password */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
-                                    <div className="relative">
-                                        <input
-                                            type={showPassword ? 'text' : 'password'}
-                                            name="password"
-                                            placeholder="••••••••"
-                                            value={formData.password}
-                                            onChange={handleChange}
-                                            className={`w-full pl-10 pr-12 py-3 rounded-xl border ${errors.password ? 'border-red-300 bg-red-50' : 'border-gray-200'} focus:outline-none focus:ring-2 focus:ring-yoga-sage-400`}
-                                        />
-                                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowPassword(!showPassword)}
-                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                                        >
-                                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                                        </button>
-                                    </div>
-                                    {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
-                                </div>
-
-                                {/* Submit Button */}
-                                <Button
-                                    type="submit"
-                                    className="w-full justify-center"
-                                    disabled={isLoading}
-                                >
-                                    {isLoading ? (
-                                        <span className="flex items-center space-x-2">
-                                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                            <span>Signing in...</span>
-                                        </span>
-                                    ) : (
-                                        <span>Login as {role.charAt(0).toUpperCase() + role.slice(1)}</span>
+                            ) : (
+                                <>
+                                    {errors.api && (
+                                        <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg text-center">
+                                            {errors.api}
+                                        </div>
                                     )}
-                                </Button>
-                            </form>
+
+                                    <form onSubmit={handleSubmit} className="space-y-6">
+                                        {/* Email */}
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                            <div className="relative">
+                                                <input
+                                                    type="email"
+                                                    name="email"
+                                                    placeholder={config.demo.email}
+                                                    value={formData.email}
+                                                    onChange={handleChange}
+                                                    className={`w-full pl-10 pr-4 py-3 rounded-xl border ${errors.email ? 'border-red-300 bg-red-50' : 'border-gray-200'} focus:outline-none focus:ring-2 focus:ring-yoga-sage-400`}
+                                                />
+                                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                            </div>
+                                            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+                                        </div>
+
+                                        {/* Password */}
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                                            <div className="relative">
+                                                <input
+                                                    type={showPassword ? 'text' : 'password'}
+                                                    name="password"
+                                                    placeholder="••••••••"
+                                                    value={formData.password}
+                                                    onChange={handleChange}
+                                                    className={`w-full pl-10 pr-12 py-3 rounded-xl border ${errors.password ? 'border-red-300 bg-red-50' : 'border-gray-200'} focus:outline-none focus:ring-2 focus:ring-yoga-sage-400`}
+                                                />
+                                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowPassword(!showPassword)}
+                                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                                >
+                                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                                </button>
+                                            </div>
+                                            {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+                                        </div>
+
+                                        {/* Submit Button */}
+                                        <Button
+                                            type="submit"
+                                            className="w-full justify-center"
+                                            disabled={isLoading}
+                                        >
+                                            {isLoading ? (
+                                                <span className="flex items-center space-x-2">
+                                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                                    <span>Signing in...</span>
+                                                </span>
+                                            ) : (
+                                                <span>Login as {role.charAt(0).toUpperCase() + role.slice(1)}</span>
+                                            )}
+                                        </Button>
+                                    </form>
+                                </>
+                            )}
 
 
                             <div className="mt-6 text-center">
@@ -251,8 +265,8 @@ const Login = () => {
                         </div>
                     </div>
                 </section>
-            </div>
-        </div>
+            </div >
+        </div >
     )
 }
 

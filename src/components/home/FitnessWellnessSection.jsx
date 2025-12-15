@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Activity, Zap, Shield, Heart, Brain, Moon, Smile, Wind } from 'lucide-react'
+import { Activity, Zap, Shield, Heart, Brain, Moon, Smile, Wind, ArrowUpRight } from 'lucide-react'
 import SectionTitle from '../ui/SectionTitle'
 
 const FitnessWellnessSection = () => {
@@ -60,38 +60,48 @@ const FitnessWellnessSection = () => {
 
     const BenefitCard = ({ item, colorTheme }) => {
         const isPeach = colorTheme === 'peach';
-        const bgClass = isPeach ? 'bg-yoga-peach-50' : 'bg-yoga-lavender-50';
-        const borderClass = isPeach ? 'border-yoga-peach-100' : 'border-yoga-lavender-100';
-        const iconColor = isPeach ? 'text-yoga-peach-500' : 'text-yoga-lavender-500';
+        // Cosmic Color Mapping
+        const bgGradient = isPeach
+            ? 'from-orange-50 to-rose-50 hover:from-orange-100 hover:to-rose-100'
+            : 'from-indigo-50 to-purple-50 hover:from-indigo-100 hover:to-purple-100';
+
+        const accentColor = isPeach ? 'text-orange-500' : 'text-indigo-500';
+        const ringColor = isPeach ? 'ring-orange-100' : 'ring-indigo-100';
+
         // Generate ID from title (e.g., "Heart Health" -> "heart-health")
         const id = item.title.toLowerCase().replace(/\s+/g, '-');
 
         return (
-            <Link to={`/benefit/${id}`} className="block h-full">
-                <div className={`${bgClass} border ${borderClass} rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2 group h-full flex flex-col cursor-pointer`}>
-                    {/* Image Area */}
-                    <div className="h-40 overflow-hidden relative">
+            <Link to={`/benefit/${id}`} className="block h-full group perspective-1000">
+                <div className={`relative bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 h-full flex flex-col border border-gray-100`}>
+
+                    {/* Image Area with Overlay */}
+                    <div className="h-48 overflow-hidden relative">
                         <img
                             src={item.image}
                             alt={item.title}
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />
-                        <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-300"></div>
+                        <div className={`absolute inset-0 bg-gradient-to-t ${isPeach ? 'from-orange-900/60' : 'from-indigo-900/60'} to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-500`}></div>
 
-                        {/* Floating Icon */}
-                        <div className={`absolute -bottom-6 right-6 w-12 h-12 bg-white rounded-xl flex items-center justify-center ${iconColor} shadow-lg z-10 group-hover:scale-110 transition-transform duration-300`}>
+                        {/* Floating Icon Badge */}
+                        <div className={`absolute -bottom-6 right-6 w-14 h-14 bg-white rounded-2xl flex items-center justify-center ${accentColor} shadow-xl z-10 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
                             {item.icon}
                         </div>
                     </div>
 
                     {/* Content Area */}
-                    <div className="p-6 pt-8 flex-grow">
-                        <h4 className="text-xl font-bold text-gray-800 mb-3 group-hover:text-yoga-sage-600 transition-colors">{item.title}</h4>
-                        <p className="text-gray-600 text-sm leading-relaxed">
+                    <div className={`p-8 pt-10 flex-grow bg-gradient-to-br ${bgGradient} transition-colors duration-500`}>
+                        <h4 className="text-2xl font-display font-bold text-gray-900 mb-3 group-hover:text-black transition-colors">{item.title}</h4>
+                        <p className="text-gray-600 text-sm leading-relaxed mb-6">
                             {item.description}
                         </p>
-                        <div className={`mt-4 text-xs font-bold uppercase tracking-wider ${iconColor} opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0`}>
-                            View Tips & Steps →
+
+                        <div className="flex items-center justify-between mt-auto pt-4 border-t border-black/5">
+                            <span className={`text-xs font-bold uppercase tracking-wider ${accentColor}`}>Learn More</span>
+                            <div className={`p-2 rounded-full bg-white/50 text-gray-400 group-hover:bg-white group-hover:text-black transition-all duration-300 transform group-hover:rotate-45`}>
+                                <ArrowUpRight size={16} />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -100,22 +110,27 @@ const FitnessWellnessSection = () => {
     }
 
     return (
-        <section className="py-24 bg-white">
-            <div className="container-custom">
-                <SectionTitle
-                    title="Complete Harmony"
-                    subtitle="Balance Your Life"
-                    className="mb-16"
-                />
+        <section className="py-32 bg-white relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-gray-50 to-transparent -z-10"></div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
+            <div className="container-custom">
+                <div className="text-center max-w-3xl mx-auto mb-20">
+                    <span className="text-purple-600 font-bold tracking-widest uppercase mb-4 block">Holistic Well-being</span>
+                    <h2 className="text-4xl md:text-5xl font-display font-bold text-gray-900 mb-6">Complete Harmony</h2>
+                    <p className="text-xl text-gray-500 font-light">Integrating body and mind for a balanced existence.</p>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 relative">
+                    {/* Vertical Divider (Desktop) */}
+                    <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-gray-200 to-transparent"></div>
+
                     {/* Physical Vitality Column */}
                     <div>
-                        <div className="flex items-center justify-center mb-10">
-                            <h3 className="text-2xl font-bold text-yoga-peach-600 relative inline-block">
-                                Physical Vitality
-                                <span className="absolute -bottom-2 left-0 right-0 h-1 bg-yoga-peach-200 rounded-full"></span>
-                            </h3>
+                        <div className="flex items-center justify-center mb-12">
+                            <div className="text-center">
+                                <h3 className="text-3xl font-display font-bold text-gray-900 mb-2">Physical Vitality</h3>
+                                <div className="h-1 w-20 bg-gradient-to-r from-orange-400 to-rose-400 rounded-full mx-auto"></div>
+                            </div>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -127,11 +142,11 @@ const FitnessWellnessSection = () => {
 
                     {/* Mental Clarity Column */}
                     <div>
-                        <div className="flex items-center justify-center mb-10">
-                            <h3 className="text-2xl font-bold text-yoga-lavender-600 relative inline-block">
-                                Mental Clarity
-                                <span className="absolute -bottom-2 left-0 right-0 h-1 bg-yoga-lavender-200 rounded-full"></span>
-                            </h3>
+                        <div className="flex items-center justify-center mb-12">
+                            <div className="text-center">
+                                <h3 className="text-3xl font-display font-bold text-gray-900 mb-2">Mental Clarity</h3>
+                                <div className="h-1 w-20 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full mx-auto"></div>
+                            </div>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
