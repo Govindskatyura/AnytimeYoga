@@ -11,7 +11,16 @@ const protect = async (req, res, next) => {
     ) {
         try {
             token = req.headers.authorization.split(' ')[1]
-            const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret123')
+            const jwtSecret = process.env.JWT_SECRET
+
+            if (!jwtSecret && process.env.NODE_ENV === 'production') {
+                console.error('JWT_SECRET not set in production')
+                res.status(500).json({ message: 'Server misconfiguration' })
+                return
+            }
+
+            const secretToUse = jwtSecret || 'dev_jwt_secret_change_me'
+            const decoded = jwt.verify(token, secretToUse)
 
             // Try to find user or teacher
             req.user = await User.findById(decoded.id).select('-password')
