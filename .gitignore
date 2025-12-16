@@ -1,2 +1,5 @@
 degine.md
 node_modules
+# Environment files (should not be committed)
+.env
+backend/.env
